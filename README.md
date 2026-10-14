@@ -13,17 +13,17 @@ The repository contains the following core components and assemblies:
 
 ## 📖 Documentation & Guides
 
-Comprehensive guides and operational documentation are available in the [DiGi.YOLO GitHub Wiki](https://github.com/ZiolkowskiJakub/DiGi.YOLO/wiki):
-* **[Year Built Prediction Pipeline](https://github.com/ZiolkowskiJakub/DiGi.YOLO/wiki/Year-Built-Prediction-Pipeline):** End-to-end architecture, frozen weights provenance, Python requirements, database row scoping, and superseding the legacy file-based workflow.
-* **[Running Scripts Manually](https://github.com/ZiolkowskiJakub/DiGi.YOLO/wiki/Running-Scripts-Manually):** Standalone execution guide for `predict.py`, `train.py`, and `export.py`.
-* **[ConsoleApp Operator Guide (DiGi.GIS.YOLO.UI)](https://github.com/ZiolkowskiJakub/DiGi.GIS.YOLO.UI/wiki/Using-the-ConsoleApp):** Complete operational manual for the headless runner `DiGi.GIS.YOLO.UI.ConsoleApp.exe`.
+Comprehensive guides and operational documentation are available in the [DiGi.YOLO GitHub Wiki](https://github.com/DiGi-Organization/DiGi.YOLO/wiki):
+* **[Year Built Prediction Pipeline](https://github.com/DiGi-Organization/DiGi.YOLO/wiki/Year-Built-Prediction-Pipeline):** End-to-end architecture, frozen weights provenance, Python requirements, database row scoping, and superseding the legacy file-based workflow.
+* **[Running Scripts Manually](https://github.com/DiGi-Organization/DiGi.YOLO/wiki/Running-Scripts-Manually):** Standalone execution guide for `predict.py`, `train.py`, and `export.py`.
+* **[ConsoleApp Operator Guide (DiGi.GIS.YOLO.UI)](https://github.com/DiGi-Organization/DiGi.GIS.YOLO.UI/wiki/Using-the-ConsoleApp):** Complete operational manual for the headless runner `DiGi.GIS.YOLO.UI.ConsoleApp.exe`.
 
 ---
 
 ## 🤖 YOLO Model & Execution Pipeline
 
 ### Frozen Weights Provenance
-The pipeline depends on one frozen checkpoint, `YOLO/models/model.pt`. Since 2026-10-08 that is **`train9_fresh`**, selected by the detector gate of [DiGi.GIS.YOLO.UI#12](https://github.com/ZiolkowskiJakub/DiGi.GIS.YOLO.UI/issues/12) and shipped together with the year-built regressor fitted to its features ([DiGi.GIS.ML#13](https://github.com/ZiolkowskiJakub/DiGi.GIS.ML/issues/13)). The values below are read out of the checkpoint itself (`version`, `date`, `train_args`) and its run's `results.csv`, not recorded by hand:
+The pipeline depends on one frozen checkpoint, `YOLO/models/model.pt`. Since 2026-10-08 that is **`train9_fresh`**, selected by the detector gate of [DiGi.GIS.YOLO.UI#12](https://github.com/DiGi-Organization/DiGi.GIS.YOLO.UI/issues/12) and shipped together with the year-built regressor fitted to its features ([DiGi.GIS.ML#13](https://github.com/DiGi-Organization/DiGi.GIS.ML/issues/13)). The values below are read out of the checkpoint itself (`version`, `date`, `train_args`) and its run's `results.csv`, not recorded by hand:
 
 | | `train9_fresh` (shipped) | `train8` (previous; the rollback) |
 |---|---|---|
@@ -53,7 +53,7 @@ The shipped weights live in the git-ignored `user files/YOLO/models/model.pt`, t
 To read these back from any `.pt` without installing torch: the file is a zip, and `data.pkl` inside it unpickles to a dictionary carrying `version`, `date` and `train_args`.
 
 ### Pretrained Base Checkpoint
-New detectors are trained from the latest ultralytics pretrained weights rather than continued from `train8` alone ([#17](https://github.com/ZiolkowskiJakub/DiGi.YOLO/issues/17)). The checkpoint is fetched once, never downloaded implicitly at train time, and stored in the git-ignored `user files/YOLO/models/base/`:
+New detectors are trained from the latest ultralytics pretrained weights rather than continued from `train8` alone ([#17](https://github.com/DiGi-Organization/DiGi.YOLO/issues/17)). The checkpoint is fetched once, never downloaded implicitly at train time, and stored in the git-ignored `user files/YOLO/models/base/`:
 
 | | |
 |---|---|
@@ -66,17 +66,17 @@ New detectors are trained from the latest ultralytics pretrained weights rather 
 
 ultralytics 8.3.130 cannot load it; `check.py` reports a warning when the installed ultralytics is older than the version that wrote the model it is given. An ONNX export of a YOLO26 detector made with `nms` at its default (`None`, no NMS embedded) answers the raw `[batch, 4 + nc, 8400]` one-to-many head layout, so the in-process decoder is unchanged. Under ultralytics 8.4.165, passing `nms=False` would select the one-to-one NMS-free head and change the output shape.
 
-Both start points train under 8.4.165: a 3-epoch smoke run (2026-09-29, RTX 5090, batch 16, imgsz 640, 240 images pseudo-labelled by `model.pt`) completed from `yolo26x.pt` and from `model.pt`, and each `best.pt` reloads and predicts. YOLO26 trains without the DFL loss term, so its loss columns differ from `train8`'s. Real runs belong to the argument-driven `train.py` ([#16](https://github.com/ZiolkowskiJakub/DiGi.YOLO/issues/16)).
+Both start points train under 8.4.165: a 3-epoch smoke run (2026-09-29, RTX 5090, batch 16, imgsz 640, 240 images pseudo-labelled by `model.pt`) completed from `yolo26x.pt` and from `model.pt`, and each `best.pt` reloads and predicts. YOLO26 trains without the DFL loss term, so its loss columns differ from `train8`'s. Real runs belong to the argument-driven `train.py` ([#16](https://github.com/DiGi-Organization/DiGi.YOLO/issues/16)).
 
 ### Frozen ONNX Export Provenance
 The same detector is also scored in process, without an interpreter, by
-[DiGi.YOLO.ONNX](https://github.com/ZiolkowskiJakub/DiGi.YOLO.ONNX). That path consumes an ONNX export of the checkpoint above, produced once by `export.py`. The export is as frozen as the checkpoint it came from, so it is recorded the same way - by a digest read off the artefact:
+[DiGi.YOLO.ONNX](https://github.com/DiGi-Organization/DiGi.YOLO.ONNX). That path consumes an ONNX export of the checkpoint above, produced once by `export.py`. The export is as frozen as the checkpoint it came from, so it is recorded the same way - by a digest read off the artefact:
 
 | | `train9_fresh` (current) | `train8` (previous) |
 |---|---|---|
-| Exported | 2026-10-07 ([DiGi.YOLO.ONNX#2](https://github.com/ZiolkowskiJakub/DiGi.YOLO.ONNX/issues/2)) | 2026-09-03 |
+| Exported | 2026-10-07 ([DiGi.YOLO.ONNX#2](https://github.com/DiGi-Organization/DiGi.YOLO.ONNX/issues/2)) | 2026-09-03 |
 | Exported by | ultralytics 8.4.165, Python 3.13, torch 2.7.0+cu128, onnx 1.22.0, onnxslim 0.1.96 | ultralytics 8.3.130, torch 2.7.0+cu128, onnx 1.22.0, onnxslim 0.1.96 |
-| Flags | `format=onnx`, `imgsz=640`, `opset=12`, `dynamic=True`, `simplify=True`, `half=False`, `nms` unset ([#20](https://github.com/ZiolkowskiJakub/DiGi.YOLO/issues/20)) | the same, with `nms=False` (under 8.3.130 only "do not embed NMS") |
+| Flags | `format=onnx`, `imgsz=640`, `opset=12`, `dynamic=True`, `simplify=True`, `half=False`, `nms` unset ([#20](https://github.com/DiGi-Organization/DiGi.YOLO/issues/20)) | the same, with `nms=False` (under 8.3.130 only "do not embed NMS") |
 | Metadata | `end2end: False` | — |
 | Bytes | 224 047 962 | 273 083 173 |
 | SHA-256 | `27ec80105e0215cde9cf091989310446c8703a49a30b5826ee0efea3382471a8` | `7cfb1a79209fa27a43f07a2151dfebaad3baedf93c94bc25a92a6bdbc4040213` |
@@ -123,7 +123,7 @@ BoundingBoxResultFile? boundingBoxResultFile = Create.BoundingBoxResultFile(yOLO
 * Cancelling kills the interpreter only - `netstandard2.0` has no process-tree kill, so torch worker processes can outlive it.
 
 ### Training a Detector from C#
-`Modify.Train` runs `train.py` and `Modify.Validate` runs `val.py`, the same way `Modify.Predict` runs `predict.py` ([#16](https://github.com/ZiolkowskiJakub/DiGi.YOLO/issues/16)). A dataset is written with `Modify.Write(YOLOModel)`, whose `conf.yaml` carries an absolute `path:` and the labels.
+`Modify.Train` runs `train.py` and `Modify.Validate` runs `val.py`, the same way `Modify.Predict` runs `predict.py` ([#16](https://github.com/DiGi-Organization/DiGi.YOLO/issues/16)). A dataset is written with `Modify.Write(YOLOModel)`, whose `conf.yaml` carries an absolute `path:` and the labels.
 
 ```csharp
 YOLOTrainingOptions? yOLOTrainingOptions = Create.YOLOTrainingOptions(null, pathStartWeights, pathConfigurationFile);
@@ -149,13 +149,13 @@ YOLOValidationResult? yOLOValidationResult = yOLOValidationOptions.Validate(canc
 * **Output weights** are read from the block `train.py` prints last (`Weights:`, `Bytes:`, `SHA256:`, `AMP:`) and confirmed against the file on disk; `Succeeded` requires the match.
 * **Never into `YOLO/models`:** a run whose project folder lies inside a `YOLO\models` folder is refused, and ultralytics numbers a taken run name rather than reusing its directory, so no run replaces the frozen `model.pt`.
 * **Preflight and isolation:** a checkpoint is preflighted with `Query.YOLOEnvironmentResult` (an ultralytics too old for the checkpoint is refused), and the run gets its own `YOLO_CONFIG_DIR`. The scripts are rewritten before every run, so a directory never trains with a `train.py` of an older build.
-* **Stall detection ([#22](https://github.com/ZiolkowskiJakub/DiGi.YOLO/issues/22)):** a training that stops producing output for `YOLOTrainingOptions.InactivityTimeout` (default 15 minutes, `null` or non-positive to disable) is ended together with the worker processes it started - a deadlocked run leaves every process alive at 0 % CPU holding the GPU - and reported through `YOLOTrainingResult.Stalled` with the reason in the standard-error tail, distinct from a cancellation and from a crash. A piped training writes a progress line per batch during every phase, so 15 minutes is a large margin over the sub-second cadence of a healthy run. Cancelling a run ends the whole process tree as well.
+* **Stall detection ([#22](https://github.com/DiGi-Organization/DiGi.YOLO/issues/22)):** a training that stops producing output for `YOLOTrainingOptions.InactivityTimeout` (default 15 minutes, `null` or non-positive to disable) is ended together with the worker processes it started - a deadlocked run leaves every process alive at 0 % CPU holding the GPU - and reported through `YOLOTrainingResult.Stalled` with the reason in the standard-error tail, distinct from a cancellation and from a crash. A piped training writes a progress line per batch during every phase, so 15 minutes is a large margin over the sub-second cadence of a healthy run. Cancelling a run ends the whole process tree as well.
 * **Downloads at train time:** ultralytics' AMP check downloads `yolo26n.pt` into the `weights` folder of the working directory and, offline, silently trains in full precision - `YOLOTrainingResult.Amp` reports the precision actually used. It also downloads `Arial.ttf` into the settings directory. Neither changes the start weights.
 * **YOLO26 loss columns:** a YOLO26 run has no `dfl_loss` in its `results.csv`; nothing here reads it.
 * **Validation:** `val.py --split val|test` (default `test`) prints `mAP50:` and `mAP50-95:`; `YOLOValidationResult` carries both with the SHA-256 of the weights it measured, so a gate table names exactly which file each row is.
 
 #### Resuming an interrupted run
-A run stopped mid-epoch (a power cut, a killed interpreter, a closed console) leaves an unfinished `<project>\<name>\weights\last.pt` that still carries its optimizer and EMA state. `Modify.Train` continues it when `YOLOTrainingOptions.ResumePath` names that file ([#21](https://github.com/ZiolkowskiJakub/DiGi.YOLO/issues/21)):
+A run stopped mid-epoch (a power cut, a killed interpreter, a closed console) leaves an unfinished `<project>\<name>\weights\last.pt` that still carries its optimizer and EMA state. `Modify.Train` continues it when `YOLOTrainingOptions.ResumePath` names that file ([#21](https://github.com/DiGi-Organization/DiGi.YOLO/issues/21)):
 
 ```csharp
 YOLOTrainingOptions yOLOTrainingOptions = new()
@@ -427,6 +427,11 @@ never in `files/`.** Both are copied to the build output by a `.csproj` target; 
   - **Generated output also belongs here.** Test reports, diagnostic dumps, benchmark logs and text
     logs written during a run go to `user files/reports/` — never to `files/`. In tests, resolve the
     folder with `assembly.ReportsDirectory()` rather than a hardcoded path (see §7).
+  - **`user files/` ships with the build.** `CopyUserFiles` flattens it into `bin` and `Deploy.ps1`
+    carries `bin` to the hosts, so it holds only what the deployed tool reads at runtime. Training inputs
+    (alternative weights, base weights, reference tables, training options and reports) live in a training
+    directory outside the workspace; the Year Built runner extension deploys from an allowlist, of `YOLO`
+    only `model.pt` (`Coding - YOLO.md` §3, §5).
 
 **Overriding Rule:** In case of duplicate relative file paths between `files/` and `user files/`, assets from `user files/` MUST ALWAYS take precedence and override assets from `files/`. Specifying `AfterTargets="CopyFiles"` ensures `CopyUserFiles` runs strictly after `CopyFiles` to overwrite any duplicates.
 
@@ -701,7 +706,7 @@ public GroundTemperature(GroundTemperature? groundTemperature)
 #### 📂 Shared Test Data Files (Fixtures)
 When a test needs an on-disk input file (`.gmf`, `.json`, `.epw`, …), use the **one shared `files` directory** — do NOT add a per-project data folder.
 
-1. **Location:** `DiGi.Test/files/` (the `DiGi.Test` repo sits beside the other `DiGi.*` repos under the `DigiProject` workspace root; from a `DiGi.Test/<ProjectName>.xUnit/` dir it is `../files/`). The path is given relative to the workspace root because this guideline lives in the separate `DiGi.Maintenance` repo.
+1. **Location:** `DiGi.Test/files/` (the `DiGi.Test` repo sits beside the other `DiGi.*` repos under the `DiGi` workspace root; from a `DiGi.Test/<ProjectName>.xUnit/` dir it is `../files/`). The path is given relative to the workspace root because this guideline lives in the separate `DiGi.Maintenance` repo.
 2. **Add a fixture:** drop the file into `DiGi.Test/files/` and reference it by file name only. Files are read **in place** (not copied to build output) — no `<None CopyToOutputDirectory>` entry needed.
 3. **Resolve the path:** `Core.xUnit.Query.FilePath(System.Reflection.Assembly.GetExecutingAssembly(), "<fileName>")` returns the absolute path to `DiGi.Test/files/<fileName>`; for the directory itself use `assembly.FilesDirectory()`. Both live in `DiGi.Core.xUnit/Query/` (`FilePath.cs`, `FilesDirectory.cs`) and resolve by walking up from the test assembly's `bin/<ProjectName>.xUnit/` output. `FilePath` `Assert`s the directory resolves, so a `null`/missing result fails the test cleanly.
 4. **No `using` needed** — call it fully qualified as `Core.xUnit.Query.FilePath(...)`; it resolves via the same innermost-enclosing-namespace lookup as `Core.xUnit.Query.SerializationCheck(...)`, as long as the test namespace nests under `DiGi`. Add `using System.Reflection;` (or fully qualify `Assembly`).
@@ -773,6 +778,7 @@ also mirrored per repository as a skill under `.agents/skills/<skill-name>/SKILL
 | `Coding - Automatic Tests.md` | Writing xUnit tests, shared fixtures, or test report output. |
 | `Coding - Geometry.md` | Orienting, closing, triangulating, hashing or sweeping geometry — `SunDirection` points away from the sun, `Vector3D.Unit` is never null, `IsClosed` is not monotonic in tolerance, sub-tolerance corners hang `Triangulate`, symmetric fixtures cannot catch a mirror. |
 | `Coding - ComputeSharp.md` | Writing or changing a ComputeSharp `IComputeShader` — never combine an odd root constant count (`ConstantBufferSize / 4`) with an odd resource count (silently wrong results on NVIDIA RTX 5090); reorder or pad fields, then update the layout guard fact. |
+| `Coding - YOLO.md` | YOLO Year Built detector — runner modes, `model.pt` resolution, the first-detection year built predictor, training data and training scratch outside the workspace (never in `user files/`), deploying the runner extension from an allowlist (only `model.pt`). |
 | `Coding - Templates.md` | Scaffolding a solution/project from `templates/`. |
 | `Coding - WebAPI GLTF.md` | Building or extending a Web API on the `DiGi.GLTF` 3D framework. |
 | `Coding - WebAPI Contracts.md` | Changing a WebAPI route/parameter, or writing an HTTP client of one; adding a controller constructor (exactly one public) or returning a DiGi object (`Content(Core.Convert.ToSystem_String(x), "application/json")`, never `Ok(x)`); client timeouts. |

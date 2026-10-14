@@ -5,7 +5,7 @@
 # checkpoint, train9_fresh (YOLO26x, saved 2026-10-07), was trained and written by 8.4.165 and does
 # not load under 8.3.130. The previous one, train8 (YOLOv8x), was written by 8.3.130 (saved
 # 2025-05-23, 150 epochs, imgsz 640);
-# 8.4.165 was adopted on 2026-09-28 (ZiolkowskiJakub/DiGi.YOLO#17) after it reproduced that
+# 8.4.165 was adopted on 2026-09-28 (DiGi-Organization/DiGi.YOLO#17) after it reproduced that
 # checkpoint's detections on 1 000 held images: identical detection counts, box edges within
 # 0.017 px, confidence within 0.0004, every matched pair at IoU >= 0.9999. 8.3.130 cannot load
 # YOLO26 checkpoints at all, which is what forced the move.

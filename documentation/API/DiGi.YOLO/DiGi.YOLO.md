@@ -564,7 +564,7 @@ The detections, or `null` when the options could not be built or the run did not
 
 Runs the YOLO prediction script over a directory of images in a CPython process and reports how the run went\.
 
-The scripts are laid down in the working directory when they are not already there, a stale result file is removed so a failed run cannot be mistaken for this one, and the process is then run with its output streams captured. A source directory holding no images is answered without starting a process at all, because predict.py writes no result file in that case and the missing file would otherwise be indistinguishable from a crash.
+The scripts are written into the working directory on every run, so a directory never keeps a script of an older build, a stale result file is removed so a failed run cannot be mistaken for this one, and the process is then run with its output streams captured. A source directory holding no images is answered without starting a process at all, because predict.py writes no result file in that case and the missing file would otherwise be indistinguishable from a crash.
 
 The ultralytics settings file is isolated in the working directory: the process is started with YOLO_CONFIG_DIR pointing at the .yolo-config folder of that directory, so the run never reads or rewrites the shared machine-wide settings file another ultralytics version uses.
 
@@ -1154,6 +1154,31 @@ The path to normalize\.
 #### Returns
 [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')  
 The normalized path, or `null` when the path is null, empty, or cannot be resolved to a full path\.
+
+<a name='DiGi.YOLO.Query.PredictArguments(thisDiGi.YOLO.Classes.YOLOPredictionOptions)'></a>
+
+## Query\.PredictArguments\(this YOLOPredictionOptions\) Method
+
+Builds the command line arguments that run predict\.py for the given options: the script path followed by its flags\.
+
+The paths are taken as given, so pass options whose paths are already resolved - [Predict\(this YOLOPredictionOptions, CancellationToken\)](DiGi.YOLO.md#DiGi.YOLO.Modify.Predict(thisDiGi.YOLO.Classes.YOLOPredictionOptions,System.Threading.CancellationToken) 'DiGi\.YOLO\.Modify\.Predict\(this DiGi\.YOLO\.Classes\.YOLOPredictionOptions, System\.Threading\.CancellationToken\)') does. Numbers are written in the invariant culture, because argparse parses them with float() and int(), which read a decimal point and nothing else.
+
+The settings that change the detections are passed only when asked for: --imgsz only for a positive multiple of 32, --half only when on. Without them the model is called exactly as earlier builds called it (DiGi-Organization/DiGi.YOLO#24). --workers is always passed, a negative value as 0, because it changes only the time a run takes. A batch size below one is passed as 32, the script's own default.
+
+```csharp
+public static string? PredictArguments(this DiGi.YOLO.Classes.YOLOPredictionOptions? yOLOPredictionOptions);
+```
+#### Parameters
+
+<a name='DiGi.YOLO.Query.PredictArguments(thisDiGi.YOLO.Classes.YOLOPredictionOptions).yOLOPredictionOptions'></a>
+
+`yOLOPredictionOptions` [YOLOPredictionOptions](DiGi.YOLO.Classes.md#DiGi.YOLO.Classes.YOLOPredictionOptions 'DiGi\.YOLO\.Classes\.YOLOPredictionOptions')
+
+The options of the run\.
+
+#### Returns
+[System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')  
+The arguments, or `null` when the options are missing the weights, the source directory, the output path or the working directory\.
 
 <a name='DiGi.YOLO.Query.PythonPath(string)'></a>
 

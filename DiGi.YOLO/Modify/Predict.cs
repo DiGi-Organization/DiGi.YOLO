@@ -1,9 +1,7 @@
 using DiGi.YOLO.Classes;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Text;
 using System.Threading;
 
 namespace DiGi.YOLO
@@ -12,7 +10,7 @@ namespace DiGi.YOLO
     {
         /// <summary>
         /// Runs the YOLO prediction script over a directory of images in a CPython process and reports how the run went.
-        /// <para>The scripts are laid down in the working directory when they are not already there, a stale result file is removed so a failed run cannot be mistaken for this one, and the process is then run with its output streams captured. A source directory holding no images is answered without starting a process at all, because predict.py writes no result file in that case and the missing file would otherwise be indistinguishable from a crash.</para>
+        /// <para>The scripts are written into the working directory on every run, so a directory never keeps a script of an older build, a stale result file is removed so a failed run cannot be mistaken for this one, and the process is then run with its output streams captured. A source directory holding no images is answered without starting a process at all, because predict.py writes no result file in that case and the missing file would otherwise be indistinguishable from a crash.</para>
         /// <para>The ultralytics settings file is isolated in the working directory: the process is started with YOLO_CONFIG_DIR pointing at the .yolo-config folder of that directory, so the run never reads or rewrites the shared machine-wide settings file another ultralytics version uses.</para>
         /// <para>The run is synchronous. Cancelling it kills the interpreter and returns a result carrying a non-zero exit code rather than throwing. Only the interpreter is killed - this targets netstandard2.0, which has no overload for killing a whole process tree, so torch worker processes can outlive the cancellation.</para>
         /// </summary>
@@ -76,11 +74,8 @@ namespace DiGi.YOLO
                 Directory.CreateDirectory(workingDirectory);
             }
 
-            //predict.py imports utils.py, and Python resolves that against the directory the script sits in, so the two have to be written together
-            if (!File.Exists(Path.Combine(workingDirectory, Constants.FileName.Predict)) || !File.Exists(Path.Combine(workingDirectory, Constants.FileName.Utils)))
-            {
-                WriteScripts(workingDirectory);
-            }
+            //Rewritten on every run, as the preflight does, never only when missing: a working directory outlives builds, and an older predict.py handed a flag it does not know exits with argparse's code 2 (DiGi-Organization/DiGi.YOLO#24). predict.py imports utils.py, and Python resolves that against the directory the script sits in, so the two are written together
+            WriteScripts(workingDirectory);
 
             string? directory_Output = Path.GetDirectoryName(outputPath);
             if (!string.IsNullOrWhiteSpace(directory_Output) && !Directory.Exists(directory_Output))
@@ -94,28 +89,25 @@ namespace DiGi.YOLO
                 File.Delete(outputPath);
             }
 
-            static string Quoted(string? value)
+            //The resolved paths, so that the file the runner deletes and reads back is the file the process is told to write
+            YOLOPredictionOptions yOLOPredictionOptions_Resolved = new(yOLOPredictionOptions)
             {
-                return string.Concat("\"", value, "\"");
+                ModelPath = modelPath,
+                OutputPath = outputPath,
+                SourceDirectory = sourceDirectory,
+                WorkingDirectory = workingDirectory
+            };
+
+            string? arguments = Query.PredictArguments(yOLOPredictionOptions_Resolved);
+            if (arguments is null)
+            {
+                return null;
             }
-
-            StringBuilder stringBuilder_Arguments = new();
-            stringBuilder_Arguments.Append(Quoted(Path.Combine(workingDirectory, Constants.FileName.Predict)));
-            stringBuilder_Arguments.Append(" --model ").Append(Quoted(modelPath));
-            stringBuilder_Arguments.Append(" --source ").Append(Quoted(sourceDirectory));
-            stringBuilder_Arguments.Append(" --output ").Append(Quoted(outputPath));
-
-            //argparse parses --conf with float(), which reads a decimal point and nothing else
-            stringBuilder_Arguments.Append(" --conf ").Append(yOLOPredictionOptions.Confidence.ToString("R", CultureInfo.InvariantCulture));
-
-            //argparse parses --batch with int()
-            int batchSize = yOLOPredictionOptions.BatchSize < 1 ? 32 : yOLOPredictionOptions.BatchSize;
-            stringBuilder_Arguments.Append(" --batch ").Append(batchSize.ToString(CultureInfo.InvariantCulture));
 
             //Isolates the ultralytics settings file in the working directory, so the run never reads or rewrites the shared machine-wide settings file another ultralytics version uses
             Dictionary<string, string> environmentVariables = Query.ConfigEnvironmentVariables(workingDirectory!);
 
-            (int exitCode, List<string> standardOutput, List<string> standardError) = Query.ExecuteProcess(pythonPath!, stringBuilder_Arguments.ToString(), workingDirectory!, environmentVariables, cancellationToken);
+            (int exitCode, List<string> standardOutput, List<string> standardError) = Query.ExecuteProcess(pythonPath!, arguments, workingDirectory!, environmentVariables, cancellationToken);
 
             List<string>? values = exitCode == 0 && File.Exists(outputPath) ? [.. File.ReadAllLines(outputPath)] : null;
 

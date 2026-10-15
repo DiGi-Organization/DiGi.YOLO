@@ -94,6 +94,25 @@ The export is not in git. The runner does not read it, so it is not deployed eit
   - `--source`: Path to input image file or directory containing images (default: `YOLO/input`).
   - `--conf`: Confidence threshold float (default: `0.1`).
   - `--output`: Output filepath for bounding box results (`.bbrf`) in write mode (`"w"`) (default: `YOLO/output/results.bbrf`).
+  - `--batch`: Images per model call (default: `32`).
+  - `--workers`: Threads that decode the next batch while the GPU detects the current one (default: `2`; `0` lets ultralytics read the files itself). Decoding uses ultralytics' own `imread`, so the detections are byte-identical.
+  - `--half`: FP16 inference, passed to ultralytics as `quantize=16` (8.4 deprecates `half` and logs a warning on every call). Changes confidences, so detections can change; off by default.
+  - `--imgsz`: Inference size; omitted, ultralytics uses `640`, the size `model.pt` was trained at (320 px tiles scaled up twice). Another size changes the detections.
+  - Options left at their defaults are not passed to the model, so a default run is the call earlier builds made. The `.bbrf` format is fixed: no header, `name` alone for an image without a box, otherwise one tab-separated line per box; chunk results are joined by concatenation.
+  - The last stderr line is `predict: images=… seconds=… rate=… load_seconds=… first_batch_seconds=… write_seconds=… preprocess_ms=… inference_ms=… postprocess_ms=… device=… imgsz=… half=… batch=… workers=…` - the detection loop's rate and its per-phase split, carried in `YOLOPredictionResult.StandardError`. It is a log line, not a contract.
+  - **Measured settings ([#24](https://github.com/DiGi-Organization/DiGi.YOLO/issues/24)).** 50 000 images of 320 × 320 px, `train9_fresh` (SHA-256 `2dd833e4…`), RTX 5090, ultralytics 8.4.165, torch 2.7.0+cu128, compared against the shipped script. Two baseline runs were byte-identical, so "identical" below means byte-identical:
+
+    | Setting | images/s | `.bbrf` against the baseline |
+    |---|---|---|
+    | before #24 (baseline, 2 runs) | 155.6 / 154.4 | — |
+    | `--workers 0` (ultralytics reads the files) | 156.4 / 150.9 | identical |
+    | `--workers 1` / `2` (3 runs) / `3` | 166.3 / 165.7 median / 164.3 | identical |
+    | `--workers 4` / `8` | 155.6 / 158.4 | identical; the prefetch threads contend for the GIL |
+    | `--batch 64` / `128` | 153.0 / 148.9 | edges move up to 3.5 px, confidences up to 0.002; no year changes; 19 / 32 GB VRAM |
+    | `--workers 2 --half` | 229.2 | 7 images change detection count; 3 of 5 506 buildings change year |
+    | `--workers 2 --imgsz 320` | 657.3 | unusable: 3 of 5 506 buildings dated |
+
+    The GPU is busy about 77 % of the time even before #24: of about 6.3 ms per image, 4.7 ms is inference at 640 px, so overlapping the decode can win only the remainder. `--workers 2` is therefore the default; `--half` and `--imgsz` stay opt-in because they change the detections.
 * **Export (`export.py`):** Turns the frozen checkpoint into the ONNX graph the in-process detector scores with. Options: `--model`, `--output`, `--imgsz` (default `640`), `--opset` (default `12`), `--static` (fixed axes instead of a dynamic batch). It prints the size and SHA-256 of what it wrote, which is what the provenance table above records. This is a one-off preparation step - it is why removing the Python dependency removes it from every *run* rather than from the repository.
 * **Python Environment:** `pip install -r requirements.txt`. `ultralytics` is pinned exactly (`==8.4.165`; the shipped `train9_fresh` was trained and written by 8.4.165; the previous `train8` was written by 8.3.130, and 8.4.165 was adopted in #17 only after reproducing its detections on 1 000 held images - identical counts, box edges within 0.017 px) because a different ultralytics can be a different detector; `torch` is a floor (`>=2.6`) because its wheels are specific to a platform and CUDA build. The file itself carries the reasoning. `onnx` and `onnxslim` sit under an export-only heading there: `export.py` needs them and nothing that runs a prediction does.
 * **Two ultralytics environments:** the main Python above carries the pinned 8.4.165; 8.3.130 is kept in the git-ignored `user files/YOLO/venv-ultralytics-8.3.130/` venv for the frozen `train8` checkpoint's parity and export path. The two must not share a settings file: ultralytics reads and writes one `settings.json` per machine, and the schemas differ (8.3.130 is v0.0.6, 8.4.165 is v0.0.8 with the `comet`/`openvino_msg` keys). Whichever version runs after the other finds a schema it does not expect, rewrites the file, prints a settings notice to stdout - into the stream `check.py` carries its JSON payload in - and, in the 8.3.130 direction, resets the settings to its own defaults, losing custom values such as `runs_dir` or `datasets_dir` without notice.
@@ -118,7 +137,8 @@ BoundingBoxResultFile? boundingBoxResultFile = Create.BoundingBoxResultFile(yOLO
 ```
 
 * `Create.YOLOPredictionOptions(...)` resolves the interpreter (a `null` path searches `PATH` for `python`, then `python3`), normalises the paths and returns `null` when the combination cannot make a run.
-* The runner writes the scripts into the working directory when they are missing, removes a stale `.bbrf` so a failed run cannot be read as this one, and answers a source directory holding no images without starting a process.
+* `BatchSize`, `Workers`, `HalfPrecision` and `ImageSize` map to `--batch`, `--workers`, `--half` and `--imgsz`; set them on the options `Create.YOLOPredictionOptions` returns. `Query.PredictArguments(options)` is the command line the runner starts.
+* The runner rewrites the scripts in the working directory on every run (an older `predict.py` would exit with code 2 on a flag it does not know), removes a stale `.bbrf` so a failed run cannot be read as this one, and answers a source directory holding no images without starting a process.
 * `YOLOPredictionResult` carries the exit code, the tail of both output streams, the image count and the run's `DateTimeOffset` bounds. `Create.BoundingBoxResultFile(result)` gives `null` for a run that did not complete.
 * Cancelling kills the interpreter only - `netstandard2.0` has no process-tree kill, so torch worker processes can outlive it.
 

@@ -30,10 +30,13 @@ namespace DiGi.YOLO.Classes
             {
                 BatchSize = yOLOPredictionOptions.BatchSize;
                 Confidence = yOLOPredictionOptions.Confidence;
+                HalfPrecision = yOLOPredictionOptions.HalfPrecision;
+                ImageSize = yOLOPredictionOptions.ImageSize;
                 ModelPath = yOLOPredictionOptions.ModelPath;
                 OutputPath = yOLOPredictionOptions.OutputPath;
                 PythonPath = yOLOPredictionOptions.PythonPath;
                 SourceDirectory = yOLOPredictionOptions.SourceDirectory;
+                Workers = yOLOPredictionOptions.Workers;
                 WorkingDirectory = yOLOPredictionOptions.WorkingDirectory;
             }
         }
@@ -60,6 +63,20 @@ namespace DiGi.YOLO.Classes
         /// </summary>
         [JsonInclude, JsonPropertyName(nameof(Confidence))]
         public double Confidence { get; set; } = 0.1;
+
+        /// <summary>
+        /// Gets or sets whether the model runs in half precision (FP16), passed to predict.py as --half.
+        /// <para>Off by default. FP16 moves confidences in the last digits, which can drop or add a detection near the confidence threshold and change the first year a building is detected with confidence 0.5 or more, so the detections are not those of a full precision run (DiGi-Organization/DiGi.YOLO#24).</para>
+        /// </summary>
+        [JsonInclude, JsonPropertyName(nameof(HalfPrecision))]
+        public bool HalfPrecision { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the size the images are scaled to for inference, passed to predict.py as --imgsz.
+        /// <para>Null passes nothing, and ultralytics then uses its default of 640 - the size the shipped weights were trained at, from 320 pixel tiles scaled up twice. Another value shows the model buildings at a scale it was not trained on and changes the detections (DiGi-Organization/DiGi.YOLO#24). A value that is not a positive multiple of 32 is not passed.</para>
+        /// </summary>
+        [JsonInclude, JsonPropertyName(nameof(ImageSize))]
+        public int? ImageSize { get; set; } = null;
 
         /// <summary>
         /// Gets or sets the path of the trained weights file the prediction scores with, passed to predict.py as --model.
@@ -90,8 +107,15 @@ namespace DiGi.YOLO.Classes
         public string? SourceDirectory { get; set; } = null;
 
         /// <summary>
+        /// Gets or sets the number of threads that decode the next batch of images while the model detects the current one, passed to predict.py as --workers.
+        /// <para>The default of 2 matches the script's own. Zero lets ultralytics read the files itself, batch after batch, so the GPU waits while the images are decoded. Above zero the images are decoded with the function ultralytics reads files with, so the detections are byte for byte the same; only the time they take changes. On 50 000 images on an RTX 5090, one to three threads ran at 164-168 images/s against 155 with none, and four or more lost the gain to contention for the Python interpreter lock (DiGi-Organization/DiGi.YOLO#24). A negative value is treated as zero.</para>
+        /// </summary>
+        [JsonInclude, JsonPropertyName(nameof(Workers))]
+        public int Workers { get; set; } = 2;
+
+        /// <summary>
         /// Gets or sets the directory the prediction process runs in, which is also where the runner keeps the Python scripts.
-        /// <para>predict.py imports utils.py, and Python resolves that import against the directory the script itself sits in, so the two files have to stay together. The runner puts them there with <see cref="Modify.WriteScripts(string?)"/> when they are missing. Ultralytics also writes its own caches here.</para>
+        /// <para>predict.py imports utils.py, and Python resolves that import against the directory the script itself sits in, so the two files have to stay together. The runner puts them there with <see cref="Modify.WriteScripts(string?)"/> on every run, so an older script left there is replaced. Ultralytics also writes its own caches here.</para>
         /// </summary>
         [JsonInclude, JsonPropertyName(nameof(WorkingDirectory))]
         public string? WorkingDirectory { get; set; } = null;

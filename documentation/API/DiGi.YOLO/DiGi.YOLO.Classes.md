@@ -2221,6 +2221,36 @@ public double Confidence { get; set; }
 #### Property Value
 [System\.Double](https://learn.microsoft.com/en-us/dotnet/api/system.double 'System\.Double')
 
+<a name='DiGi.YOLO.Classes.YOLOPredictionOptions.HalfPrecision'></a>
+
+## YOLOPredictionOptions\.HalfPrecision Property
+
+Gets or sets whether the model runs in half precision \(FP16\), passed to predict\.py as \-\-half\.
+
+Off by default. FP16 moves confidences in the last digits, which can drop or add a detection near the confidence threshold and change the first year a building is detected with confidence 0.5 or more, so the detections are not those of a full precision run (DiGi-Organization/DiGi.YOLO#24).
+
+```csharp
+public bool HalfPrecision { get; set; }
+```
+
+#### Property Value
+[System\.Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean 'System\.Boolean')
+
+<a name='DiGi.YOLO.Classes.YOLOPredictionOptions.ImageSize'></a>
+
+## YOLOPredictionOptions\.ImageSize Property
+
+Gets or sets the size the images are scaled to for inference, passed to predict\.py as \-\-imgsz\.
+
+Null passes nothing, and ultralytics then uses its default of 640 - the size the shipped weights were trained at, from 320 pixel tiles scaled up twice. Another value shows the model buildings at a scale it was not trained on and changes the detections (DiGi-Organization/DiGi.YOLO#24). A value that is not a positive multiple of 32 is not passed.
+
+```csharp
+public System.Nullable<int> ImageSize { get; set; }
+```
+
+#### Property Value
+[System\.Nullable&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1 'System\.Nullable\`1')[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1 'System\.Nullable\`1')
+
 <a name='DiGi.YOLO.Classes.YOLOPredictionOptions.ModelPath'></a>
 
 ## YOLOPredictionOptions\.ModelPath Property
@@ -2281,13 +2311,28 @@ public string? SourceDirectory { get; set; }
 #### Property Value
 [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
 
+<a name='DiGi.YOLO.Classes.YOLOPredictionOptions.Workers'></a>
+
+## YOLOPredictionOptions\.Workers Property
+
+Gets or sets the number of threads that decode the next batch of images while the model detects the current one, passed to predict\.py as \-\-workers\.
+
+The default of 2 matches the script's own. Zero lets ultralytics read the files itself, batch after batch, so the GPU waits while the images are decoded. Above zero the images are decoded with the function ultralytics reads files with, so the detections are byte for byte the same; only the time they take changes. On 50 000 images on an RTX 5090, one to three threads ran at 164-168 images/s against 155 with none, and four or more lost the gain to contention for the Python interpreter lock (DiGi-Organization/DiGi.YOLO#24). A negative value is treated as zero.
+
+```csharp
+public int Workers { get; set; }
+```
+
+#### Property Value
+[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
+
 <a name='DiGi.YOLO.Classes.YOLOPredictionOptions.WorkingDirectory'></a>
 
 ## YOLOPredictionOptions\.WorkingDirectory Property
 
 Gets or sets the directory the prediction process runs in, which is also where the runner keeps the Python scripts\.
 
-predict.py imports utils.py, and Python resolves that import against the directory the script itself sits in, so the two files have to stay together. The runner puts them there with [WriteScripts\(string\)](DiGi.YOLO.md#DiGi.YOLO.Modify.WriteScripts(string) 'DiGi\.YOLO\.Modify\.WriteScripts\(string\)') when they are missing. Ultralytics also writes its own caches here.
+predict.py imports utils.py, and Python resolves that import against the directory the script itself sits in, so the two files have to stay together. The runner puts them there with [WriteScripts\(string\)](DiGi.YOLO.md#DiGi.YOLO.Modify.WriteScripts(string) 'DiGi\.YOLO\.Modify\.WriteScripts\(string\)') on every run, so an older script left there is replaced. Ultralytics also writes its own caches here.
 
 ```csharp
 public string? WorkingDirectory { get; set; }

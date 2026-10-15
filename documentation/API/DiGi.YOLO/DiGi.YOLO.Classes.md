@@ -2525,7 +2525,7 @@ public string? OutputPath { get; }
 
 ## YOLOPredictionResult\.StandardError Property
 
-Gets the trailing lines the process wrote to its standard error stream, at most [OutputLines](DiGi.YOLO.Constants.md#DiGi.YOLO.Constants.Count.OutputLines 'DiGi\.YOLO\.Constants\.Count\.OutputLines') of them\.
+Gets the trailing lines the process wrote to its standard error stream, at most [DiGi\.Python\.Constants\.Count\.OutputLines](https://learn.microsoft.com/en-us/dotnet/api/digi.python.constants.count.outputlines 'DiGi\.Python\.Constants\.Count\.OutputLines') of them\.
 
 ```csharp
 public System.Collections.Generic.List<string>? StandardError { get; }
@@ -2538,7 +2538,7 @@ public System.Collections.Generic.List<string>? StandardError { get; }
 
 ## YOLOPredictionResult\.StandardOutput Property
 
-Gets the trailing lines the process wrote to its standard output stream, at most [OutputLines](DiGi.YOLO.Constants.md#DiGi.YOLO.Constants.Count.OutputLines 'DiGi\.YOLO\.Constants\.Count\.OutputLines') of them\.
+Gets the trailing lines the process wrote to its standard output stream, at most [DiGi\.Python\.Constants\.Count\.OutputLines](https://learn.microsoft.com/en-us/dotnet/api/digi.python.constants.count.outputlines 'DiGi\.Python\.Constants\.Count\.OutputLines') of them\.
 
 ```csharp
 public System.Collections.Generic.List<string>? StandardOutput { get; }

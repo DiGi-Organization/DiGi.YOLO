@@ -111,7 +111,7 @@ namespace DiGi.YOLO
             string? directory_File = Path.GetDirectoryName(Path.GetFullPath(path));
             if (!string.IsNullOrWhiteSpace(directory_File))
             {
-                string? directory_Resolved = string.IsNullOrWhiteSpace(directory) ? directory_File : Query.NormalizedPath(Path.Combine(directory_File, directory));
+                string? directory_Resolved = string.IsNullOrWhiteSpace(directory) ? directory_File : Python.Query.NormalizedPath(Path.Combine(directory_File, directory));
                 if (string.IsNullOrWhiteSpace(directory_Resolved) || !Directory.Exists(directory_Resolved))
                 {
                     messages = [string.Format("Dataset directory '{0}' does not exist; the directory of the configuration file '{1}' is used instead.", directory_Resolved ?? directory, directory_File)];

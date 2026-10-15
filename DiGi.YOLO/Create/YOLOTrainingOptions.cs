@@ -17,9 +17,9 @@ namespace DiGi.YOLO
         /// <returns>The options, or <c>null</c> when no interpreter was found, the configuration file does not exist, or the start file does not exist or is neither a .pt nor a .yaml file.</returns>
         public static YOLOTrainingOptions? YOLOTrainingOptions(string? pythonPath, string? modelPath, string? configurationFilePath, string? workingDirectory = null)
         {
-            string? pythonPath_Resolved = Query.PythonPath(pythonPath);
-            string? modelPath_Resolved = Query.NormalizedPath(modelPath);
-            string? configurationFilePath_Resolved = Query.NormalizedPath(configurationFilePath);
+            string? pythonPath_Resolved = Python.Query.PythonPath(pythonPath);
+            string? modelPath_Resolved = Python.Query.NormalizedPath(modelPath);
+            string? configurationFilePath_Resolved = Python.Query.NormalizedPath(configurationFilePath);
 
             if (string.IsNullOrWhiteSpace(pythonPath_Resolved))
             {
@@ -37,7 +37,7 @@ namespace DiGi.YOLO
             }
 
             //Derived only once the configuration file is known to be there, because Path.GetDirectoryName throws on a null argument outside .NET Core
-            string? workingDirectory_Resolved = Query.NormalizedPath(workingDirectory) ?? Query.NormalizedPath(Path.GetDirectoryName(configurationFilePath_Resolved));
+            string? workingDirectory_Resolved = Python.Query.NormalizedPath(workingDirectory) ?? Python.Query.NormalizedPath(Path.GetDirectoryName(configurationFilePath_Resolved));
 
             if (string.IsNullOrWhiteSpace(workingDirectory_Resolved))
             {

@@ -1,3 +1,4 @@
+using DiGi.Python.Classes;
 using DiGi.YOLO.Classes;
 using System;
 using System.Collections.Generic;
@@ -45,10 +46,10 @@ namespace DiGi.YOLO
             }
 
             //Resolved once, so that the file the runner deletes and reads back is the file the process is told to write. The process runs in a directory of its own, so a relative path would not mean the same thing on both sides.
-            modelPath = Query.NormalizedPath(modelPath) ?? modelPath;
-            outputPath = Query.NormalizedPath(outputPath) ?? outputPath;
-            sourceDirectory = Query.NormalizedPath(sourceDirectory) ?? sourceDirectory;
-            workingDirectory = Query.NormalizedPath(workingDirectory) ?? workingDirectory;
+            modelPath = Python.Query.NormalizedPath(modelPath) ?? modelPath;
+            outputPath = Python.Query.NormalizedPath(outputPath) ?? outputPath;
+            sourceDirectory = Python.Query.NormalizedPath(sourceDirectory) ?? sourceDirectory;
+            workingDirectory = Python.Query.NormalizedPath(workingDirectory) ?? workingDirectory;
 
             if (!Directory.Exists(sourceDirectory))
             {
@@ -107,7 +108,10 @@ namespace DiGi.YOLO
             //Isolates the ultralytics settings file in the working directory, so the run never reads or rewrites the shared machine-wide settings file another ultralytics version uses
             Dictionary<string, string> environmentVariables = Query.ConfigEnvironmentVariables(workingDirectory!);
 
-            (int exitCode, List<string> standardOutput, List<string> standardError) = Query.ExecuteProcess(pythonPath!, arguments, workingDirectory!, environmentVariables, cancellationToken);
+            PythonProcessResult pythonProcessResult = Python.Query.ExecuteProcess(pythonPath!, arguments, workingDirectory!, environmentVariables, cancellationToken);
+            int exitCode = pythonProcessResult.ExitCode;
+            List<string> standardOutput = pythonProcessResult.StandardOutput ?? [];
+            List<string> standardError = pythonProcessResult.StandardError ?? [];
 
             List<string>? values = exitCode == 0 && File.Exists(outputPath) ? [.. File.ReadAllLines(outputPath)] : null;
 

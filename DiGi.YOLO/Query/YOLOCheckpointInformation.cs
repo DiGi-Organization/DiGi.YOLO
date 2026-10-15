@@ -1,3 +1,4 @@
+using DiGi.Python.Classes;
 using DiGi.YOLO.Classes;
 using System.Collections.Generic;
 using System.IO;
@@ -20,19 +21,19 @@ namespace DiGi.YOLO
         /// <returns>The information the checkpoint holds, or <c>null</c> when it cannot be read.</returns>
         public static YOLOCheckpointInformation? YOLOCheckpointInformation(string? path, string? pythonPath = null, string? workingDirectory = null, CancellationToken cancellationToken = default)
         {
-            string? path_Checkpoint = NormalizedPath(path) ?? path;
+            string? path_Checkpoint = Python.Query.NormalizedPath(path) ?? path;
             if (string.IsNullOrWhiteSpace(path_Checkpoint) || !File.Exists(path_Checkpoint))
             {
                 return null;
             }
 
-            string? path_Python = PythonPath(pythonPath);
+            string? path_Python = Python.Query.PythonPath(pythonPath);
             if (string.IsNullOrWhiteSpace(path_Python))
             {
                 return null;
             }
 
-            string? path_Working = NormalizedPath(workingDirectory) ?? workingDirectory;
+            string? path_Working = Python.Query.NormalizedPath(workingDirectory) ?? workingDirectory;
             if (string.IsNullOrWhiteSpace(path_Working))
             {
                 path_Working = Path.Combine(Path.GetTempPath(), "DiGi_YOLO_Checkpoint");
@@ -105,14 +106,17 @@ namespace DiGi.YOLO
             string scriptPath = Path.Combine(path_Working, Constants.FileName.Checkpoint);
             string arguments = string.Concat(Quoted(scriptPath), " --model ", Quoted(path_Checkpoint));
 
-            (int exitCode, List<string> standardOutput, List<string> standardError) = ExecuteProcess(path_Python!, arguments, path_Working!, environmentVariables, cancellationToken);
+            PythonProcessResult pythonProcessResult = Python.Query.ExecuteProcess(path_Python!, arguments, path_Working!, environmentVariables, cancellationToken);
+            int exitCode = pythonProcessResult.ExitCode;
+            List<string> standardOutput = pythonProcessResult.StandardOutput ?? [];
+            List<string> standardError = pythonProcessResult.StandardError ?? [];
 
             if (exitCode != 0)
             {
                 return null;
             }
 
-            string? line_Json = CheckJsonLine(standardOutput, Constants.Marker.CheckpointJsonBegin, Constants.Marker.CheckpointJsonEnd);
+            string? line_Json = Python.Query.MarkedJson(standardOutput, Constants.Marker.CheckpointJsonBegin, Constants.Marker.CheckpointJsonEnd);
             if (string.IsNullOrWhiteSpace(line_Json))
             {
                 return null;

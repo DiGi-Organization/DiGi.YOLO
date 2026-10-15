@@ -3,34 +3,6 @@
 ## DiGi\.YOLO\.Constants Namespace
 ### Classes
 
-<a name='DiGi.YOLO.Constants.Count'></a>
-
-## Count Class
-
-Provides constant counts used to bound the data collected while running the YOLO scripts\.
-
-```csharp
-public static class Count
-```
-
-Inheritance [System\.Object](https://learn.microsoft.com/en-us/dotnet/api/system.object 'System\.Object') → Count
-### Fields
-
-<a name='DiGi.YOLO.Constants.Count.OutputLines'></a>
-
-## Count\.OutputLines Field
-
-The number of trailing lines kept from each of the prediction process output streams\.
-
-predict.py prints a line for every image it processes and ultralytics prints more on top of that, so a county sized run writes megabytes to its output streams. Only the tail is kept, because that is the part carrying the reason a run ended the way it did.
-
-```csharp
-public const int OutputLines = 200;
-```
-
-#### Field Value
-[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')
-
 <a name='DiGi.YOLO.Constants.DirectoryName'></a>
 
 ## DirectoryName Class
@@ -413,7 +385,7 @@ public const string MAP50_95 = "mAP50-95:";
 
 The prefix of the line train\.py prints, before a resumed run and again in its success block, the 1\-based epoch training resumes into under\.
 
-Printed in both places because the start of a long run is evicted from the tail [ExecuteProcess\(string, string, string, Dictionary&lt;string,string&gt;, CancellationToken\)](DiGi.YOLO.md#DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Collections.Generic.Dictionary_string,string_,System.Threading.CancellationToken) 'DiGi\.YOLO\.Query\.ExecuteProcess\(string, string, string, System\.Collections\.Generic\.Dictionary\<string,string\>, System\.Threading\.CancellationToken\)') keeps, so only the success block copy survives for the parser.
+Printed in both places because the start of a long run is evicted from the tail [DiGi\.Python\.Query\.ExecuteProcess\(System\.String,System\.String,System\.String,System\.Collections\.Generic\.Dictionary\{System\.String,System\.String\},System\.Threading\.CancellationToken\)](https://learn.microsoft.com/en-us/dotnet/api/digi.python.query.executeprocess#digi-python-query-executeprocess(system-string-system-string-system-string-system-collections-generic-dictionary{system-string-system-string}-system-threading-cancellationtoken) 'DiGi\.Python\.Query\.ExecuteProcess\(System\.String,System\.String,System\.String,System\.Collections\.Generic\.Dictionary\{System\.String,System\.String\},System\.Threading\.CancellationToken\)') keeps, so only the success block copy survives for the parser.
 
 ```csharp
 public const string ResumeEpoch = "Resume epoch:";

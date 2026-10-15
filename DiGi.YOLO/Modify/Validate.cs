@@ -1,3 +1,4 @@
+using DiGi.Python.Classes;
 using DiGi.YOLO.Classes;
 using DiGi.YOLO.Enums;
 using System;
@@ -35,10 +36,10 @@ namespace DiGi.YOLO
                 return null;
             }
 
-            modelPath = Query.NormalizedPath(modelPath) ?? modelPath;
-            configurationFilePath = Query.NormalizedPath(configurationFilePath) ?? configurationFilePath;
+            modelPath = Python.Query.NormalizedPath(modelPath) ?? modelPath;
+            configurationFilePath = Python.Query.NormalizedPath(configurationFilePath) ?? configurationFilePath;
 
-            string? workingDirectory = Query.NormalizedPath(yOLOValidationOptions.WorkingDirectory) ?? Query.NormalizedPath(Path.GetDirectoryName(configurationFilePath));
+            string? workingDirectory = Python.Query.NormalizedPath(yOLOValidationOptions.WorkingDirectory) ?? Python.Query.NormalizedPath(Path.GetDirectoryName(configurationFilePath));
             if (string.IsNullOrWhiteSpace(workingDirectory))
             {
                 return null;
@@ -75,7 +76,7 @@ namespace DiGi.YOLO
                 return Refused(null, [string.Format(CultureInfo.InvariantCulture, "Invalid parameters: imgsz {0}, batch {1}, conf {2}.", yOLOValidationOptions.ImageSize, yOLOValidationOptions.Batch, yOLOValidationOptions.Confidence)]);
             }
 
-            string? modelSHA256 = Query.FileSHA256(modelPath);
+            string? modelSHA256 = Python.Query.FileSHA256(modelPath);
 
             try
             {
@@ -132,7 +133,10 @@ namespace DiGi.YOLO
 
             Dictionary<string, string> environmentVariables = Query.ConfigEnvironmentVariables(workingDirectory!);
 
-            (int exitCode, List<string> standardOutput, List<string> standardError) = Query.ExecuteProcess(pythonPath!, stringBuilder_Arguments.ToString(), workingDirectory!, environmentVariables, cancellationToken);
+            PythonProcessResult pythonProcessResult = Python.Query.ExecuteProcess(pythonPath!, stringBuilder_Arguments.ToString(), workingDirectory!, environmentVariables, cancellationToken);
+            int exitCode = pythonProcessResult.ExitCode;
+            List<string> standardOutput = pythonProcessResult.StandardOutput ?? [];
+            List<string> standardError = pythonProcessResult.StandardError ?? [];
 
             (double? mAP50, double? mAP50_95) = Query.YOLOValidationOutput(standardOutput);
 

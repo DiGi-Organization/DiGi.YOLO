@@ -746,6 +746,8 @@ predict.py, train.py and export.py import utils.py, and Python resolves that aga
 
 The scripts are always rewritten, so a directory never keeps running a script of an older build. The template conf.yaml is the exception: it is data rather than a script, so it is written only when the directory has none and never replaces the conf.yaml of a dataset written there.
 
+The files are written by [DiGi\.Python\.Modify\.WriteScripts\(System\.Reflection\.Assembly,System\.String,System\.String,System\.Collections\.Generic\.IEnumerable\{System\.String\},System\.String,System\.Collections\.Generic\.IEnumerable\{System\.String\}\)](https://learn.microsoft.com/en-us/dotnet/api/digi.python.modify.writescripts#digi-python-modify-writescripts(system-reflection-assembly-system-string-system-string-system-collections-generic-ienumerable{system-string}-system-string-system-collections-generic-ienumerable{system-string}) 'DiGi\.Python\.Modify\.WriteScripts\(System\.Reflection\.Assembly,System\.String,System\.String,System\.Collections\.Generic\.IEnumerable\{System\.String\},System\.String,System\.Collections\.Generic\.IEnumerable\{System\.String\}\)') from the resources of this assembly.
+
 ```csharp
 public static bool WriteScripts(string? directory);
 ```
@@ -771,64 +773,6 @@ public static class Query
 
 Inheritance [System\.Object](https://learn.microsoft.com/en-us/dotnet/api/system.object 'System\.Object') → Query
 ### Methods
-
-<a name='DiGi.YOLO.Query.CheckJsonLine(System.Collections.Generic.List_string_)'></a>
-
-## Query\.CheckJsonLine\(List\<string\>\) Method
-
-Finds the JSON payload line of a check\.py run in its captured stdout\.
-
-The payload is the first non-empty line between the [CheckJsonBegin](DiGi.YOLO.Constants.md#DiGi.YOLO.Constants.Marker.CheckJsonBegin 'DiGi\.YOLO\.Constants\.Marker\.CheckJsonBegin') and [CheckJsonEnd](DiGi.YOLO.Constants.md#DiGi.YOLO.Constants.Marker.CheckJsonEnd 'DiGi\.YOLO\.Constants\.Marker\.CheckJsonEnd') markers, so the result does not depend on what the interpreter or ultralytics print before or after it - a settings notice included.
-
-```csharp
-public static string? CheckJsonLine(System.Collections.Generic.List<string> standardOutput);
-```
-#### Parameters
-
-<a name='DiGi.YOLO.Query.CheckJsonLine(System.Collections.Generic.List_string_).standardOutput'></a>
-
-`standardOutput` [System\.Collections\.Generic\.List&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')
-
-The captured stdout lines of the run\.
-
-#### Returns
-[System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')  
-The JSON payload line, or `null` when the markers or the payload between them are absent\.
-
-<a name='DiGi.YOLO.Query.CheckJsonLine(System.Collections.Generic.List_string_,string,string)'></a>
-
-## Query\.CheckJsonLine\(List\<string\>, string, string\) Method
-
-Finds the JSON payload line a YOLO script writes between a pair of marker lines in its captured stdout\.
-
-The payload is the first non-empty line between the begin and end markers, so the result does not depend on what the interpreter, ultralytics or the script print before or after it - a settings notice included. check.py and checkpoint.py share this contract with different marker pairs.
-
-```csharp
-public static string? CheckJsonLine(System.Collections.Generic.List<string> standardOutput, string beginMarker, string endMarker);
-```
-#### Parameters
-
-<a name='DiGi.YOLO.Query.CheckJsonLine(System.Collections.Generic.List_string_,string,string).standardOutput'></a>
-
-`standardOutput` [System\.Collections\.Generic\.List&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')
-
-The captured stdout lines of the run\.
-
-<a name='DiGi.YOLO.Query.CheckJsonLine(System.Collections.Generic.List_string_,string,string).beginMarker'></a>
-
-`beginMarker` [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
-
-The marker line the script prints immediately before its JSON payload\.
-
-<a name='DiGi.YOLO.Query.CheckJsonLine(System.Collections.Generic.List_string_,string,string).endMarker'></a>
-
-`endMarker` [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
-
-The marker line the script prints immediately after its JSON payload\.
-
-#### Returns
-[System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')  
-The JSON payload line, or `null` when the markers or the payload between them are absent\.
 
 <a name='DiGi.YOLO.Query.ConfigEnvironmentVariables(string)'></a>
 
@@ -918,168 +862,6 @@ The path string to be encoded\. This value can be null\.
 [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')  
 An encoded version of the path, or an empty string if the provided path is null or whitespace\.
 
-<a name='DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Collections.Generic.Dictionary_string,string_,System.Nullable_System.TimeSpan_,System.Threading.CancellationToken)'></a>
-
-## Query\.ExecuteProcess\(string, string, string, Dictionary\<string,string\>, Nullable\<TimeSpan\>, CancellationToken\) Method
-
-Executes a process with captured standard output and standard error streams, additional environment variables, cancellation support, and an inactivity limit that ends a process which stops producing output\.
-
-Launches the process without creating a window, using UTF-8 encodings for both streams. Reading both streams asynchronously prevents deadlocks when process output buffers fill up. Cancelling or reaching the limit ends the process together with every process it started.
-
-```csharp
-public static (int ExitCode,System.Collections.Generic.List<string> StandardOutput,System.Collections.Generic.List<string> StandardError,bool Stalled) ExecuteProcess(string executablePath, string arguments, string workingDirectory, System.Collections.Generic.Dictionary<string,string>? environmentVariables, System.Nullable<System.TimeSpan> inactivityTimeout, System.Threading.CancellationToken cancellationToken=default(System.Threading.CancellationToken));
-```
-#### Parameters
-
-<a name='DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Collections.Generic.Dictionary_string,string_,System.Nullable_System.TimeSpan_,System.Threading.CancellationToken).executablePath'></a>
-
-`executablePath` [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
-
-The full path of the executable process to run\.
-
-<a name='DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Collections.Generic.Dictionary_string,string_,System.Nullable_System.TimeSpan_,System.Threading.CancellationToken).arguments'></a>
-
-`arguments` [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
-
-The command line arguments passed to the process\.
-
-<a name='DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Collections.Generic.Dictionary_string,string_,System.Nullable_System.TimeSpan_,System.Threading.CancellationToken).workingDirectory'></a>
-
-`workingDirectory` [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
-
-The working directory context for the process execution\.
-
-<a name='DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Collections.Generic.Dictionary_string,string_,System.Nullable_System.TimeSpan_,System.Threading.CancellationToken).environmentVariables'></a>
-
-`environmentVariables` [System\.Collections\.Generic\.Dictionary&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2 'System\.Collections\.Generic\.Dictionary\`2')[System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')[,](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2 'System\.Collections\.Generic\.Dictionary\`2')[System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2 'System\.Collections\.Generic\.Dictionary\`2')
-
-The environment variables set on the process on top of the inherited environment, or `null`\.
-
-<a name='DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Collections.Generic.Dictionary_string,string_,System.Nullable_System.TimeSpan_,System.Threading.CancellationToken).inactivityTimeout'></a>
-
-`inactivityTimeout` [System\.Nullable&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1 'System\.Nullable\`1')[System\.TimeSpan](https://learn.microsoft.com/en-us/dotnet/api/system.timespan 'System\.TimeSpan')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1 'System\.Nullable\`1')
-
-The span without a line on either output stream after which the process is ended, or `null` for no limit\. A value that is not positive disables the limit as well\.
-
-<a name='DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Collections.Generic.Dictionary_string,string_,System.Nullable_System.TimeSpan_,System.Threading.CancellationToken).cancellationToken'></a>
-
-`cancellationToken` [System\.Threading\.CancellationToken](https://learn.microsoft.com/en-us/dotnet/api/system.threading.cancellationtoken 'System\.Threading\.CancellationToken')
-
-The token that cancels process execution\.
-
-#### Returns
-[&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple 'System\.ValueTuple')[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[,](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple 'System\.ValueTuple')[System\.Collections\.Generic\.List&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[,](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple 'System\.ValueTuple')[System\.Collections\.Generic\.List&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[,](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple 'System\.ValueTuple')[System\.Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean 'System\.Boolean')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple 'System\.ValueTuple')  
-A tuple containing the process exit code \(\-1 when the process was cancelled or ended for inactivity\), standard output lines, standard error lines, and whether the process was ended for inactivity\.
-
-<a name='DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Collections.Generic.Dictionary_string,string_,System.Threading.CancellationToken)'></a>
-
-## Query\.ExecuteProcess\(string, string, string, Dictionary\<string,string\>, CancellationToken\) Method
-
-Executes a process with captured standard output and standard error streams, additional environment variables and cancellation support\.
-
-Same contract as [ExecuteProcess\(string, string, string, Dictionary&lt;string,string&gt;, Nullable&lt;TimeSpan&gt;, CancellationToken\)](DiGi.YOLO.md#DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Collections.Generic.Dictionary_string,string_,System.Nullable_System.TimeSpan_,System.Threading.CancellationToken) 'DiGi\.YOLO\.Query\.ExecuteProcess\(string, string, string, System\.Collections\.Generic\.Dictionary\<string,string\>, System\.Nullable\<System\.TimeSpan\>, System\.Threading\.CancellationToken\)'), without an inactivity limit.
-
-```csharp
-public static (int ExitCode,System.Collections.Generic.List<string> StandardOutput,System.Collections.Generic.List<string> StandardError) ExecuteProcess(string executablePath, string arguments, string workingDirectory, System.Collections.Generic.Dictionary<string,string>? environmentVariables, System.Threading.CancellationToken cancellationToken=default(System.Threading.CancellationToken));
-```
-#### Parameters
-
-<a name='DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Collections.Generic.Dictionary_string,string_,System.Threading.CancellationToken).executablePath'></a>
-
-`executablePath` [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
-
-The full path of the executable process to run\.
-
-<a name='DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Collections.Generic.Dictionary_string,string_,System.Threading.CancellationToken).arguments'></a>
-
-`arguments` [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
-
-The command line arguments passed to the process\.
-
-<a name='DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Collections.Generic.Dictionary_string,string_,System.Threading.CancellationToken).workingDirectory'></a>
-
-`workingDirectory` [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
-
-The working directory context for the process execution\.
-
-<a name='DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Collections.Generic.Dictionary_string,string_,System.Threading.CancellationToken).environmentVariables'></a>
-
-`environmentVariables` [System\.Collections\.Generic\.Dictionary&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2 'System\.Collections\.Generic\.Dictionary\`2')[System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')[,](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2 'System\.Collections\.Generic\.Dictionary\`2')[System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.dictionary-2 'System\.Collections\.Generic\.Dictionary\`2')
-
-The environment variables set on the process on top of the inherited environment, or `null`\.
-
-<a name='DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Collections.Generic.Dictionary_string,string_,System.Threading.CancellationToken).cancellationToken'></a>
-
-`cancellationToken` [System\.Threading\.CancellationToken](https://learn.microsoft.com/en-us/dotnet/api/system.threading.cancellationtoken 'System\.Threading\.CancellationToken')
-
-The token that cancels process execution\.
-
-#### Returns
-[&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple 'System\.ValueTuple')[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[,](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple 'System\.ValueTuple')[System\.Collections\.Generic\.List&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[,](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple 'System\.ValueTuple')[System\.Collections\.Generic\.List&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple 'System\.ValueTuple')  
-A tuple containing the process exit code, standard output lines, and standard error lines\.
-
-<a name='DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Threading.CancellationToken)'></a>
-
-## Query\.ExecuteProcess\(string, string, string, CancellationToken\) Method
-
-Executes a process with captured standard output and standard error streams while supporting cancellation\.
-
-Launches the process without creating a window, using UTF-8 encodings for both streams. Reading both streams asynchronously prevents deadlocks when process output buffers fill up.
-
-```csharp
-public static (int ExitCode,System.Collections.Generic.List<string> StandardOutput,System.Collections.Generic.List<string> StandardError) ExecuteProcess(string executablePath, string arguments, string workingDirectory, System.Threading.CancellationToken cancellationToken=default(System.Threading.CancellationToken));
-```
-#### Parameters
-
-<a name='DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Threading.CancellationToken).executablePath'></a>
-
-`executablePath` [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
-
-The full path of the executable process to run\.
-
-<a name='DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Threading.CancellationToken).arguments'></a>
-
-`arguments` [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
-
-The command line arguments passed to the process\.
-
-<a name='DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Threading.CancellationToken).workingDirectory'></a>
-
-`workingDirectory` [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
-
-The working directory context for the process execution\.
-
-<a name='DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Threading.CancellationToken).cancellationToken'></a>
-
-`cancellationToken` [System\.Threading\.CancellationToken](https://learn.microsoft.com/en-us/dotnet/api/system.threading.cancellationtoken 'System\.Threading\.CancellationToken')
-
-The token that cancels process execution\.
-
-#### Returns
-[&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple 'System\.ValueTuple')[System\.Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32 'System\.Int32')[,](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple 'System\.ValueTuple')[System\.Collections\.Generic\.List&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[,](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple 'System\.ValueTuple')[System\.Collections\.Generic\.List&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.valuetuple 'System\.ValueTuple')  
-A tuple containing the process exit code, standard output lines, and standard error lines\.
-
-<a name='DiGi.YOLO.Query.FileSHA256(string)'></a>
-
-## Query\.FileSHA256\(string\) Method
-
-Computes the SHA\-256 digest of a file as lowercase hexadecimal \- the form train\.py and export\.py print and the README provenance tables record\.
-
-```csharp
-public static string? FileSHA256(string? path);
-```
-#### Parameters
-
-<a name='DiGi.YOLO.Query.FileSHA256(string).path'></a>
-
-`path` [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
-
-The path of the file to hash\.
-
-#### Returns
-[System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')  
-The 64\-character lowercase hexadecimal digest, or `null` when the path is empty, the file does not exist or cannot be read\.
-
 <a name='DiGi.YOLO.Query.IsInsideModelsDirectory(string)'></a>
 
 ## Query\.IsInsideModelsDirectory\(string\) Method
@@ -1130,31 +912,6 @@ The path of the start file\. The file does not have to exist\.
 [ModelKind](DiGi.YOLO.Enums.md#DiGi.YOLO.Enums.ModelKind 'DiGi\.YOLO\.Enums\.ModelKind')  
 The kind of the file, or [Undefined](DiGi.YOLO.Enums.md#DiGi.YOLO.Enums.ModelKind.Undefined 'DiGi\.YOLO\.Enums\.ModelKind\.Undefined') when the path is empty or has another extension\.
 
-<a name='DiGi.YOLO.Query.NormalizedPath(string)'></a>
-
-## Query\.NormalizedPath\(string\) Method
-
-Returns the full form of a path with any trailing directory separator removed\.
-
-The separator matters because these paths are handed to a process on its command line. On Windows a backslash immediately before a closing quote escapes that quote, so a directory written as "C:\scratch\" swallows the argument that follows it and the process sees something entirely different from what was intended.
-
-A root such as "C:\" keeps its separator, because removing it would leave a drive letter that names the current directory of that drive rather than its root.
-
-```csharp
-public static string? NormalizedPath(string? path);
-```
-#### Parameters
-
-<a name='DiGi.YOLO.Query.NormalizedPath(string).path'></a>
-
-`path` [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
-
-The path to normalize\.
-
-#### Returns
-[System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')  
-The normalized path, or `null` when the path is null, empty, or cannot be resolved to a full path\.
-
 <a name='DiGi.YOLO.Query.PredictArguments(thisDiGi.YOLO.Classes.YOLOPredictionOptions)'></a>
 
 ## Query\.PredictArguments\(this YOLOPredictionOptions\) Method
@@ -1179,56 +936,6 @@ The options of the run\.
 #### Returns
 [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')  
 The arguments, or `null` when the options are missing the weights, the source directory, the output path or the working directory\.
-
-<a name='DiGi.YOLO.Query.PythonPath(string)'></a>
-
-## Query\.PythonPath\(string\) Method
-
-Resolves the CPython interpreter that runs the YOLO scripts\.
-
-A path that names an existing file is taken as given. Anything else, including `null`, is looked for on PATH, trying "python" and then "python3", in PATH order.
-
-A Windows app execution alias is accepted like any other match even though it is a zero byte reparse point, because it is a working interpreter whenever its app is installed. When the app is not installed the alias opens the Microsoft Store instead and the run fails; that failure is reported through the result's standard error rather than avoided by guessing.
-
-The interpreter has to be CPython with ultralytics and torch installed. The IronPython engine in DiGi.Scripting.Python cannot host either of them, so it is not an alternative to this.
-
-```csharp
-public static string? PythonPath(string? path);
-```
-#### Parameters
-
-<a name='DiGi.YOLO.Query.PythonPath(string).path'></a>
-
-`path` [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
-
-The path of an interpreter, the name of one on PATH, or `null` to search for one\.
-
-#### Returns
-[System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')  
-The full path of the interpreter, or `null` when none was found\.
-
-<a name='DiGi.YOLO.Query.PythonPaths(string)'></a>
-
-## Query\.PythonPaths\(string\) Method
-
-Resolves all potential CPython interpreter candidate paths on PATH\.
-
-If [path](DiGi.YOLO.md#DiGi.YOLO.Query.PythonPaths(string).path 'DiGi\.YOLO\.Query\.PythonPaths\(string\)\.path') names an existing file, it is returned as the single candidate. Otherwise, PATH is searched for [path](DiGi.YOLO.md#DiGi.YOLO.Query.PythonPaths(string).path 'DiGi\.YOLO\.Query\.PythonPaths\(string\)\.path') (if provided), "python", and "python3" in order, returning all distinct existing candidates found.
-
-```csharp
-public static System.Collections.Generic.List<string> PythonPaths(string? path=null);
-```
-#### Parameters
-
-<a name='DiGi.YOLO.Query.PythonPaths(string).path'></a>
-
-`path` [System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')
-
-The full path of an interpreter, the command name of one on PATH, or `null` to search PATH\.
-
-#### Returns
-[System\.Collections\.Generic\.List&lt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')[System\.String](https://learn.microsoft.com/en-us/dotnet/api/system.string 'System\.String')[&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1 'System\.Collections\.Generic\.List\`1')  
-A list of distinct resolved interpreter paths in search order\.
 
 <a name='DiGi.YOLO.Query.YOLOCheckpointInformation(string,string,string,System.Threading.CancellationToken)'></a>
 
@@ -1357,7 +1064,7 @@ The result of the environment preflight check\.
 
 Reads the success block train\.py prints at the end of a run \- the path, size and SHA\-256 digest of the best weights, the automatic mixed precision actually used, and, for a resumed run, the epoch it entered and the ceiling it restored \- from its standard output\.
 
-The output is scanned from the end and the last line under each prefix wins. That is where the block is, and [ExecuteProcess\(string, string, string, Dictionary&lt;string,string&gt;, CancellationToken\)](DiGi.YOLO.md#DiGi.YOLO.Query.ExecuteProcess(string,string,string,System.Collections.Generic.Dictionary_string,string_,System.Threading.CancellationToken) 'DiGi\.YOLO\.Query\.ExecuteProcess\(string, string, string, System\.Collections\.Generic\.Dictionary\<string,string\>, System\.Threading\.CancellationToken\)') keeps only the tail of a stream, which a long run fills with training progress. A resumed run prints its resume values both before training and again in this block, because a value printed only at the start would not survive in the tail. Numbers are read with the invariant culture, the only form the script writes.
+The output is scanned from the end and the last line under each prefix wins. That is where the block is, and [DiGi\.Python\.Query\.ExecuteProcess\(System\.String,System\.String,System\.String,System\.Collections\.Generic\.Dictionary\{System\.String,System\.String\},System\.Threading\.CancellationToken\)](https://learn.microsoft.com/en-us/dotnet/api/digi.python.query.executeprocess#digi-python-query-executeprocess(system-string-system-string-system-string-system-collections-generic-dictionary{system-string-system-string}-system-threading-cancellationtoken) 'DiGi\.Python\.Query\.ExecuteProcess\(System\.String,System\.String,System\.String,System\.Collections\.Generic\.Dictionary\{System\.String,System\.String\},System\.Threading\.CancellationToken\)') keeps only the tail of a stream, which a long run fills with training progress. A resumed run prints its resume values both before training and again in this block, because a value printed only at the start would not survive in the tail. Numbers are read with the invariant culture, the only form the script writes.
 
 ```csharp
 public static (string? WeightsPath,System.Nullable<long> Bytes,string? SHA256,System.Nullable<bool> Amp,System.Nullable<int> ResumedFromEpoch,System.Nullable<int> ResumedEpochs) YOLOTrainingOutput(System.Collections.Generic.IEnumerable<string>? standardOutput);

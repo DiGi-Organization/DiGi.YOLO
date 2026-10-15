@@ -165,7 +165,7 @@ namespace DiGi.YOLO.Classes
         }
 
         /// <summary>
-        /// Gets the trailing lines the process wrote to its standard error stream, at most <see cref="Constants.Count.OutputLines"/> of them.
+        /// Gets the trailing lines the process wrote to its standard error stream, at most <see cref="Python.Constants.Count.OutputLines"/> of them.
         /// </summary>
         [JsonIgnore]
         public List<string>? StandardError
@@ -177,7 +177,7 @@ namespace DiGi.YOLO.Classes
         }
 
         /// <summary>
-        /// Gets the trailing lines the process wrote to its standard output stream, at most <see cref="Constants.Count.OutputLines"/> of them.
+        /// Gets the trailing lines the process wrote to its standard output stream, at most <see cref="Python.Constants.Count.OutputLines"/> of them.
         /// </summary>
         [JsonIgnore]
         public List<string>? StandardOutput

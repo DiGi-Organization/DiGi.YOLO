@@ -1,3 +1,4 @@
+using DiGi.Python.Classes;
 using DiGi.YOLO.Classes;
 using System;
 using System.Collections.Generic;
@@ -36,8 +37,8 @@ namespace DiGi.YOLO
         {
             DateTimeOffset start = DateTimeOffset.Now;
 
-            string? path_Model = NormalizedPath(modelPath) ?? modelPath;
-            string? path_Working = NormalizedPath(workingDirectory) ?? workingDirectory;
+            string? path_Model = Python.Query.NormalizedPath(modelPath) ?? modelPath;
+            string? path_Working = Python.Query.NormalizedPath(workingDirectory) ?? workingDirectory;
 
             if (string.IsNullOrWhiteSpace(path_Working))
             {
@@ -72,7 +73,7 @@ namespace DiGi.YOLO
                 return new YOLOEnvironmentResult(false, pythonPath, null, null, null, null, path_Model, null, [string.Format("Failed to prepare working directory '{0}': {1}", path_Working, exception.Message)], null, start);
             }
 
-            List<string> candidates = PythonPaths(pythonPath);
+            List<string> candidates = Python.Query.PythonPaths(pythonPath);
             if (candidates.Count == 0)
             {
                 string message = string.IsNullOrWhiteSpace(pythonPath) ? "No Python interpreter found on PATH." : string.Format("Interpreter path '{0}' was not found.", pythonPath);
@@ -102,7 +103,10 @@ namespace DiGi.YOLO
                     break;
                 }
 
-                (int exitCode, List<string> standardOutput, List<string> standardError) = ExecuteProcess(candidate, arguments_Base, path_Working!, environmentVariables, cancellationToken);
+                PythonProcessResult pythonProcessResult = Python.Query.ExecuteProcess(candidate, arguments_Base, path_Working!, environmentVariables, cancellationToken);
+                int exitCode = pythonProcessResult.ExitCode;
+                List<string> standardOutput = pythonProcessResult.StandardOutput ?? [];
+                List<string> standardError = pythonProcessResult.StandardError ?? [];
 
                 if (exitCode != 0)
                 {
@@ -112,7 +116,7 @@ namespace DiGi.YOLO
                 }
 
                 //The payload sits between the check.py markers, so a settings notice or any other line printed before it is never picked up
-                string? line_Json = CheckJsonLine(standardOutput);
+                string? line_Json = Python.Query.MarkedJson(standardOutput, Constants.Marker.CheckJsonBegin, Constants.Marker.CheckJsonEnd);
 
                 if (string.IsNullOrWhiteSpace(line_Json))
                 {

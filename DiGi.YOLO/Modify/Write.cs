@@ -22,7 +22,7 @@ namespace DiGi.YOLO
                 return false;
             }
 
-            string? directory = Query.NormalizedPath(yOLOModel.Directory);
+            string? directory = Python.Query.NormalizedPath(yOLOModel.Directory);
             if (string.IsNullOrWhiteSpace(directory))
             {
                 return false;
@@ -84,7 +84,7 @@ namespace DiGi.YOLO
                     string path_Labels = Path.ChangeExtension(Path.Combine(directory_Labels, fileName_Image), ".txt");
 
                     //Compared as full paths: an image already saved in place under another spelling of the same path (relative, other casing) would otherwise be copied onto itself, which throws
-                    if (!string.Equals(Query.NormalizedPath(path), Query.NormalizedPath(path_Image), System.StringComparison.OrdinalIgnoreCase))
+                    if (!string.Equals(Python.Query.NormalizedPath(path), Python.Query.NormalizedPath(path_Image), System.StringComparison.OrdinalIgnoreCase))
                     {
                         File.Copy(path, path_Image, true);
                     }

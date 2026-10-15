@@ -1,3 +1,4 @@
+using DiGi.Python.Classes;
 using DiGi.YOLO.Classes;
 using DiGi.YOLO.Enums;
 using System;
@@ -46,17 +47,17 @@ namespace DiGi.YOLO
 
             if (resume)
             {
-                startPath = Query.NormalizedPath(yOLOTrainingOptions.ResumePath) ?? yOLOTrainingOptions.ResumePath;
+                startPath = Python.Query.NormalizedPath(yOLOTrainingOptions.ResumePath) ?? yOLOTrainingOptions.ResumePath;
                 modelKind = Query.ModelKind(startPath);
 
-                workingDirectory = Query.NormalizedPath(yOLOTrainingOptions.WorkingDirectory);
+                workingDirectory = Python.Query.NormalizedPath(yOLOTrainingOptions.WorkingDirectory);
                 if (string.IsNullOrWhiteSpace(workingDirectory) && !string.IsNullOrWhiteSpace(startPath))
                 {
                     //The checkpoint of a run sits in <project>\<name>\weights, so the run's working directory is two levels up; a caller that ran from a dataset directory passes its own instead
                     string? weightsDirectory = Path.GetDirectoryName(startPath!);
                     if (!string.IsNullOrWhiteSpace(weightsDirectory))
                     {
-                        workingDirectory = Query.NormalizedPath(Path.Combine(weightsDirectory!, ".."));
+                        workingDirectory = Python.Query.NormalizedPath(Path.Combine(weightsDirectory!, ".."));
                     }
                 }
             }
@@ -71,11 +72,11 @@ namespace DiGi.YOLO
                 }
 
                 //Resolved once, so that the files the runner checks and hashes are the files the process is told to read. The process runs in a directory of its own, so a relative path would not mean the same thing on both sides.
-                startPath = Query.NormalizedPath(modelPath) ?? modelPath;
-                configurationFilePath = Query.NormalizedPath(configurationFilePath) ?? configurationFilePath;
+                startPath = Python.Query.NormalizedPath(modelPath) ?? modelPath;
+                configurationFilePath = Python.Query.NormalizedPath(configurationFilePath) ?? configurationFilePath;
                 modelKind = Query.ModelKind(startPath);
 
-                workingDirectory = Query.NormalizedPath(yOLOTrainingOptions.WorkingDirectory) ?? Query.NormalizedPath(Path.GetDirectoryName(configurationFilePath));
+                workingDirectory = Python.Query.NormalizedPath(yOLOTrainingOptions.WorkingDirectory) ?? Python.Query.NormalizedPath(Path.GetDirectoryName(configurationFilePath));
             }
 
             if (string.IsNullOrWhiteSpace(startPath) || string.IsNullOrWhiteSpace(workingDirectory))
@@ -83,7 +84,7 @@ namespace DiGi.YOLO
                 return null;
             }
 
-            project = Query.NormalizedPath(yOLOTrainingOptions.Project) ?? Path.Combine(workingDirectory!, "runs", "detect");
+            project = Python.Query.NormalizedPath(yOLOTrainingOptions.Project) ?? Path.Combine(workingDirectory!, "runs", "detect");
 
             DateTimeOffset start = DateTimeOffset.Now;
 
@@ -162,7 +163,7 @@ namespace DiGi.YOLO
                 }
             }
 
-            string? startModelSHA256 = Query.FileSHA256(startPath);
+            string? startModelSHA256 = Python.Query.FileSHA256(startPath);
             if (string.IsNullOrWhiteSpace(startModelSHA256))
             {
                 return Refused(string.Format(resume ? "Resume checkpoint could not be read: {0}" : "Start weights could not be read: {0}", startPath));
@@ -243,14 +244,18 @@ namespace DiGi.YOLO
             //Isolates the ultralytics settings file in the working directory, so the run never reads or rewrites the shared machine-wide settings file another ultralytics version uses
             Dictionary<string, string> environmentVariables = Query.ConfigEnvironmentVariables(workingDirectory!);
 
-            (int exitCode, List<string> standardOutput, List<string> standardError, bool stalled) = Query.ExecuteProcess(pythonPath!, stringBuilder_Arguments.ToString(), workingDirectory!, environmentVariables, yOLOTrainingOptions.InactivityTimeout, cancellationToken);
+            PythonProcessResult pythonProcessResult = Python.Query.ExecuteProcess(pythonPath!, stringBuilder_Arguments.ToString(), workingDirectory!, environmentVariables, yOLOTrainingOptions.InactivityTimeout, cancellationToken);
+            int exitCode = pythonProcessResult.ExitCode;
+            List<string> standardOutput = pythonProcessResult.StandardOutput ?? [];
+            List<string> standardError = pythonProcessResult.StandardError ?? [];
+            bool stalled = pythonProcessResult.Stalled;
 
             (string? weightsPath, long? bytes, string? sHA256, bool? amp, int? resumedFromEpoch, int? _) = Query.YOLOTrainingOutput(standardOutput);
 
             //The printed identity is only trusted once the file on disk agrees with it
             if (!string.IsNullOrWhiteSpace(weightsPath))
             {
-                weightsPath = Query.NormalizedPath(weightsPath) ?? weightsPath;
+                weightsPath = Python.Query.NormalizedPath(weightsPath) ?? weightsPath;
 
                 if (!File.Exists(weightsPath))
                 {
@@ -260,7 +265,7 @@ namespace DiGi.YOLO
                 else if (sHA256 != null)
                 {
                     long bytes_File = new FileInfo(weightsPath).Length;
-                    string? sHA256_File = Query.FileSHA256(weightsPath);
+                    string? sHA256_File = Python.Query.FileSHA256(weightsPath);
                     if (bytes != bytes_File || !string.Equals(sHA256, sHA256_File, StringComparison.OrdinalIgnoreCase))
                     {
                         standardError.Add(string.Format(CultureInfo.InvariantCulture, "Reported weights identity ({0} bytes, {1}) does not match the file ({2} bytes, {3}).", bytes, sHA256, bytes_File, sHA256_File));

@@ -27,7 +27,7 @@ namespace DiGi.YOLO.Constants
 
         /// <summary>
         /// The prefix of the line train.py prints, before a resumed run and again in its success block, the 1-based epoch training resumes into under.
-        /// <para>Printed in both places because the start of a long run is evicted from the tail <see cref="Query.ExecuteProcess(string, string, string, System.Collections.Generic.Dictionary{string, string}?, System.Threading.CancellationToken)"/> keeps, so only the success block copy survives for the parser.</para>
+        /// <para>Printed in both places because the start of a long run is evicted from the tail <see cref="Python.Query.ExecuteProcess(string, string, string, System.Collections.Generic.Dictionary{string, string}?, System.Threading.CancellationToken)"/> keeps, so only the success block copy survives for the parser.</para>
         /// </summary>
         public const string ResumeEpoch = "Resume epoch:";
 

@@ -37,10 +37,10 @@ namespace DiGi.YOLO
         /// <returns>The options, or <c>null</c> when no interpreter was found, a required path is missing, the confidence is not a value between zero and one, or the batch size is less than one.</returns>
         public static YOLOPredictionOptions? YOLOPredictionOptions(string? pythonPath, string? modelPath, string? sourceDirectory, string? outputPath, string? workingDirectory, double confidence, int batchSize)
         {
-            string? pythonPath_Resolved = Query.PythonPath(pythonPath);
-            string? modelPath_Resolved = Query.NormalizedPath(modelPath);
-            string? sourceDirectory_Resolved = Query.NormalizedPath(sourceDirectory);
-            string? outputPath_Resolved = Query.NormalizedPath(outputPath);
+            string? pythonPath_Resolved = Python.Query.PythonPath(pythonPath);
+            string? modelPath_Resolved = Python.Query.NormalizedPath(modelPath);
+            string? sourceDirectory_Resolved = Python.Query.NormalizedPath(sourceDirectory);
+            string? outputPath_Resolved = Python.Query.NormalizedPath(outputPath);
 
             if (string.IsNullOrWhiteSpace(pythonPath_Resolved))
             {
@@ -63,7 +63,7 @@ namespace DiGi.YOLO
             }
 
             //Derived only once the output path is known to be there, because Path.GetDirectoryName throws on a null argument outside .NET Core
-            string? workingDirectory_Resolved = Query.NormalizedPath(workingDirectory) ?? Query.NormalizedPath(Path.GetDirectoryName(outputPath_Resolved));
+            string? workingDirectory_Resolved = Python.Query.NormalizedPath(workingDirectory) ?? Python.Query.NormalizedPath(Path.GetDirectoryName(outputPath_Resolved));
 
             if (string.IsNullOrWhiteSpace(workingDirectory_Resolved))
             {

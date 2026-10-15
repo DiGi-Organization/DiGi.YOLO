@@ -37,6 +37,9 @@
     <Reference Include="DiGi.Core">
       <HintPath>..\..\DiGi.Core\bin\DiGi.Core.dll</HintPath>
     </Reference>
+    <Reference Include="DiGi.Python">
+      <HintPath>..\..\DiGi.Python\bin\DiGi.Python.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <Target Name="CopyFiles" AfterTargets="Build">

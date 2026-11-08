@@ -47,7 +47,7 @@ namespace DiGi.YOLO
                 string? directory_Labels = yOLOModel.GetDirectory_Labels(directory, category);
 
                 IEnumerable<Image> images = yOLOModel.GetImages(category);
-                if (category == Category.Test && (images == null || images.Count() == 0))
+                if (category == Category.Test && (images == null || !images.Any()))
                 {
                     continue;
                 }
@@ -62,7 +62,7 @@ namespace DiGi.YOLO
                     Directory.CreateDirectory(directory_Labels);
                 }
 
-                if (images == null || images.Count() == 0)
+                if (images == null || !images.Any())
                 {
                     continue;
                 }

@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace DiGi.YOLO
 {
     public static partial class Modify
@@ -27,7 +29,7 @@ namespace DiGi.YOLO
             ];
 
             //The template would otherwise replace the conf.yaml describing the dataset in this directory - every dataset written by Modify.Write lost its labels and absolute path that way
-            return Python.Modify.WriteScripts(typeof(Query).Assembly, string.Format("{0}.{1}.", typeof(Query).Namespace, Constants.DirectoryName.YOLO), Constants.DirectoryName.YOLO, fileNames, directory, [Constants.FileName.Conf]);
+            return Python.Modify.WriteScripts(typeof(Query).Assembly, string.Format(CultureInfo.CurrentCulture, "{0}.{1}.", typeof(Query).Namespace, Constants.DirectoryName.YOLO), Constants.DirectoryName.YOLO, fileNames, directory, [Constants.FileName.Conf]);
         }
     }
 }

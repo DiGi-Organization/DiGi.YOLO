@@ -47,11 +47,11 @@ namespace DiGi.YOLO
                 }
 
                 //"mAP50:" is not a prefix of "mAP50-95:", so the two lines cannot be confused
-                if (mAP50 == null && line!.StartsWith(Constants.OutputPrefix.MAP50))
+                if (mAP50 == null && line!.StartsWith(Constants.OutputPrefix.MAP50, StringComparison.CurrentCulture))
                 {
                     mAP50 = Value(line.Substring(Constants.OutputPrefix.MAP50.Length));
                 }
-                else if (mAP50_95 == null && line!.StartsWith(Constants.OutputPrefix.MAP50_95))
+                else if (mAP50_95 == null && line!.StartsWith(Constants.OutputPrefix.MAP50_95, StringComparison.CurrentCulture))
                 {
                     mAP50_95 = Value(line.Substring(Constants.OutputPrefix.MAP50_95.Length));
                 }

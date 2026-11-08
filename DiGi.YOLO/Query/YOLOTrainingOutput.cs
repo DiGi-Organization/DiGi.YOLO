@@ -35,38 +35,38 @@ namespace DiGi.YOLO
                     continue;
                 }
 
-                if (weightsPath == null && line!.StartsWith(Constants.OutputPrefix.Weights))
+                if (weightsPath == null && line!.StartsWith(Constants.OutputPrefix.Weights, StringComparison.CurrentCulture))
                 {
                     string value = line.Substring(Constants.OutputPrefix.Weights.Length).Trim();
                     weightsPath = value.Length == 0 ? null : value;
                 }
-                else if (bytes == null && line!.StartsWith(Constants.OutputPrefix.Bytes))
+                else if (bytes == null && line!.StartsWith(Constants.OutputPrefix.Bytes, StringComparison.CurrentCulture))
                 {
                     if (long.TryParse(line.Substring(Constants.OutputPrefix.Bytes.Length).Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out long value))
                     {
                         bytes = value;
                     }
                 }
-                else if (sHA256 == null && line!.StartsWith(Constants.OutputPrefix.SHA256))
+                else if (sHA256 == null && line!.StartsWith(Constants.OutputPrefix.SHA256, StringComparison.CurrentCulture))
                 {
                     string value = line.Substring(Constants.OutputPrefix.SHA256.Length).Trim().ToLowerInvariant();
                     sHA256 = value.Length == 64 ? value : null;
                 }
-                else if (amp == null && line!.StartsWith(Constants.OutputPrefix.AMP))
+                else if (amp == null && line!.StartsWith(Constants.OutputPrefix.AMP, StringComparison.CurrentCulture))
                 {
                     if (bool.TryParse(line.Substring(Constants.OutputPrefix.AMP.Length).Trim(), out bool value))
                     {
                         amp = value;
                     }
                 }
-                else if (resumedFromEpoch == null && line!.StartsWith(Constants.OutputPrefix.ResumeEpoch))
+                else if (resumedFromEpoch == null && line!.StartsWith(Constants.OutputPrefix.ResumeEpoch, StringComparison.CurrentCulture))
                 {
                     if (int.TryParse(line.Substring(Constants.OutputPrefix.ResumeEpoch.Length).Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out int value))
                     {
                         resumedFromEpoch = value;
                     }
                 }
-                else if (resumedEpochs == null && line!.StartsWith(Constants.OutputPrefix.ResumeEpochs))
+                else if (resumedEpochs == null && line!.StartsWith(Constants.OutputPrefix.ResumeEpochs, StringComparison.CurrentCulture))
                 {
                     if (int.TryParse(line.Substring(Constants.OutputPrefix.ResumeEpochs.Length).Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out int value))
                     {

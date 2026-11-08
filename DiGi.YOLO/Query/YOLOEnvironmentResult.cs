@@ -1,5 +1,6 @@
 using DiGi.Python.Classes;
 using DiGi.YOLO.Classes;
+using System.Globalization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -70,13 +71,13 @@ namespace DiGi.YOLO
             }
             catch (Exception exception)
             {
-                return new YOLOEnvironmentResult(false, pythonPath, null, null, null, null, path_Model, null, [string.Format("Failed to prepare working directory '{0}': {1}", path_Working, exception.Message)], null, start);
+                return new YOLOEnvironmentResult(false, pythonPath, null, null, null, null, path_Model, null, [string.Format(CultureInfo.CurrentCulture, "Failed to prepare working directory '{0}': {1}", path_Working, exception.Message)], null, start);
             }
 
             List<string> candidates = Python.Query.PythonPaths(pythonPath);
             if (candidates.Count == 0)
             {
-                string message = string.IsNullOrWhiteSpace(pythonPath) ? "No Python interpreter found on PATH." : string.Format("Interpreter path '{0}' was not found.", pythonPath);
+                string message = string.IsNullOrWhiteSpace(pythonPath) ? "No Python interpreter found on PATH." : string.Format(CultureInfo.CurrentCulture, "Interpreter path '{0}' was not found.", pythonPath);
                 return new YOLOEnvironmentResult(false, pythonPath, null, null, null, null, path_Model, null, [message], null, start);
             }
 
@@ -110,8 +111,8 @@ namespace DiGi.YOLO
 
                 if (exitCode != 0)
                 {
-                    string errorDetail = standardError.Count > 0 ? string.Join(Environment.NewLine, standardError) : string.Format("Process exited with code {0}", exitCode);
-                    messages_Accumulated.Add(string.Format("Interpreter candidate '{0}' failed preflight run: {1}", candidate, errorDetail));
+                    string errorDetail = standardError.Count > 0 ? string.Join(Environment.NewLine, standardError) : string.Format(CultureInfo.CurrentCulture, "Process exited with code {0}", exitCode);
+                    messages_Accumulated.Add(string.Format(CultureInfo.CurrentCulture, "Interpreter candidate '{0}' failed preflight run: {1}", candidate, errorDetail));
                     continue;
                 }
 
@@ -120,7 +121,7 @@ namespace DiGi.YOLO
 
                 if (string.IsNullOrWhiteSpace(line_Json))
                 {
-                    messages_Accumulated.Add(string.Format("Interpreter candidate '{0}' returned no JSON payload.", candidate));
+                    messages_Accumulated.Add(string.Format(CultureInfo.CurrentCulture, "Interpreter candidate '{0}' returned no JSON payload.", candidate));
                     continue;
                 }
 
@@ -129,7 +130,7 @@ namespace DiGi.YOLO
                     JsonNode? jsonNode = JsonNode.Parse(line_Json!);
                     if (jsonNode == null)
                     {
-                        messages_Accumulated.Add(string.Format("Interpreter candidate '{0}' returned invalid JSON.", candidate));
+                        messages_Accumulated.Add(string.Format(CultureInfo.CurrentCulture, "Interpreter candidate '{0}' returned invalid JSON.", candidate));
                         continue;
                     }
 
@@ -169,7 +170,7 @@ namespace DiGi.YOLO
                         return new YOLOEnvironmentResult(true, candidate, pythonVersion, ultralyticsVersion, torchVersion, cudaAvailable, path_Model, modelUltralyticsVersion, messages_Candidate, warnings_Candidate, start);
                     }
 
-                    string prefix = string.Format("Candidate '{0}': ", candidate);
+                    string prefix = string.Format(CultureInfo.CurrentCulture, "Candidate '{0}': ", candidate);
                     if (messages_Candidate.Count == 0 && warnings_Candidate.Count == 0)
                     {
                         messages_Accumulated.Add(string.Concat(prefix, "Not runnable."));
@@ -189,7 +190,7 @@ namespace DiGi.YOLO
                 }
                 catch (Exception exception)
                 {
-                    messages_Accumulated.Add(string.Format("Interpreter candidate '{0}' output parsing error: {1}", candidate, exception.Message));
+                    messages_Accumulated.Add(string.Format(CultureInfo.CurrentCulture, "Interpreter candidate '{0}' output parsing error: {1}", candidate, exception.Message));
                 }
             }
 

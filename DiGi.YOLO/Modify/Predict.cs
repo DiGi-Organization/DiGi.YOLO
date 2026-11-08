@@ -1,5 +1,6 @@
 using DiGi.Python.Classes;
 using DiGi.YOLO.Classes;
+using System.Globalization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -53,7 +54,7 @@ namespace DiGi.YOLO
 
             if (!Directory.Exists(sourceDirectory))
             {
-                return new YOLOPredictionResult(-1, 0, outputPath, null, null, [string.Format("Source directory does not exist: {0}", sourceDirectory)], DateTimeOffset.Now, DateTimeOffset.Now);
+                return new YOLOPredictionResult(-1, 0, outputPath, null, null, [string.Format(CultureInfo.CurrentCulture, "Source directory does not exist: {0}", sourceDirectory)], DateTimeOffset.Now, DateTimeOffset.Now);
             }
 
             //The extensions predict.py globs for

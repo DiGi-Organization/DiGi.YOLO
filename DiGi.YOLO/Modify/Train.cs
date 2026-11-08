@@ -97,19 +97,19 @@ namespace DiGi.YOLO
             {
                 if (modelKind != ModelKind.Checkpoint)
                 {
-                    return Refused(string.Format("Resume weights are not a .pt checkpoint: {0}", startPath));
+                    return Refused(string.Format(CultureInfo.CurrentCulture, "Resume weights are not a .pt checkpoint: {0}", startPath));
                 }
             }
             else if (modelKind == ModelKind.Undefined)
             {
-                return Refused(string.Format("Start weights are neither a .pt checkpoint nor a .yaml definition: {0}", startPath));
+                return Refused(string.Format(CultureInfo.CurrentCulture, "Start weights are neither a .pt checkpoint nor a .yaml definition: {0}", startPath));
             }
 
             if (!File.Exists(startPath))
             {
                 return Refused(resume
-                    ? string.Format("Resume checkpoint does not exist: {0}", startPath)
-                    : string.Format("Start weights do not exist: {0}", startPath));
+                    ? string.Format(CultureInfo.CurrentCulture, "Resume checkpoint does not exist: {0}", startPath)
+                    : string.Format(CultureInfo.CurrentCulture, "Start weights do not exist: {0}", startPath));
             }
 
             if (resume)
@@ -117,7 +117,7 @@ namespace DiGi.YOLO
                 YOLOCheckpointInformation? checkpointInformation = Query.YOLOCheckpointInformation(startPath, pythonPath, workingDirectory, cancellationToken: cancellationToken);
                 if (checkpointInformation == null)
                 {
-                    return Refused(string.Format("Resume checkpoint could not be read: {0}", startPath));
+                    return Refused(string.Format(CultureInfo.CurrentCulture, "Resume checkpoint could not be read: {0}", startPath));
                 }
 
                 if (checkpointInformation.Finished)
@@ -136,19 +136,19 @@ namespace DiGi.YOLO
                 //Resolved the way the process will resolve it: train.py checks the checkpoint's data path against its own working directory, so a relative one is measured from there and not from wherever this runner happens to sit
                 if (string.IsNullOrWhiteSpace(dataPath_Resolved) || !File.Exists(dataPath_Resolved))
                 {
-                    return Refused(string.Format("The dataset the checkpoint was trained with does not exist: {0}", dataPath));
+                    return Refused(string.Format(CultureInfo.CurrentCulture, "The dataset the checkpoint was trained with does not exist: {0}", dataPath));
                 }
 
                 if (Query.IsInsideModelsDirectory(checkpointInformation.Project))
                 {
-                    return Refused(string.Format("Refusing to resume a run under '{0}': it is inside a YOLO\\models folder, where the frozen weights live.", checkpointInformation.Project));
+                    return Refused(string.Format(CultureInfo.CurrentCulture, "Refusing to resume a run under '{0}': it is inside a YOLO\\models folder, where the frozen weights live.", checkpointInformation.Project));
                 }
             }
             else
             {
                 if (!File.Exists(configurationFilePath))
                 {
-                    return Refused(string.Format("Configuration file does not exist: {0}", configurationFilePath));
+                    return Refused(string.Format(CultureInfo.CurrentCulture, "Configuration file does not exist: {0}", configurationFilePath));
                 }
 
                 if (yOLOTrainingOptions.Epochs < 1 || yOLOTrainingOptions.Patience < 0 || yOLOTrainingOptions.ImageSize < 32 || yOLOTrainingOptions.Batch < 1)
@@ -159,14 +159,14 @@ namespace DiGi.YOLO
                 //The run directory is project\name\weights, and ultralytics numbers a run name that is taken rather than reusing its directory. What remains is a project placed where the frozen weights live, which no run may write into
                 if (Query.IsInsideModelsDirectory(project))
                 {
-                    return Refused(string.Format("Refusing to write a run under '{0}': it is inside a YOLO\\models folder, where the frozen weights live.", project));
+                    return Refused(string.Format(CultureInfo.CurrentCulture, "Refusing to write a run under '{0}': it is inside a YOLO\\models folder, where the frozen weights live.", project));
                 }
             }
 
             string? startModelSHA256 = Python.Query.FileSHA256(startPath);
             if (string.IsNullOrWhiteSpace(startModelSHA256))
             {
-                return Refused(string.Format(resume ? "Resume checkpoint could not be read: {0}" : "Start weights could not be read: {0}", startPath));
+                return Refused(string.Format(CultureInfo.CurrentCulture, resume ? "Resume checkpoint could not be read: {0}" : "Start weights could not be read: {0}", startPath));
             }
 
             try
@@ -181,7 +181,7 @@ namespace DiGi.YOLO
             }
             catch (Exception exception)
             {
-                return Refused(string.Format("Failed to prepare working directory '{0}': {1}", workingDirectory, exception.Message));
+                return Refused(string.Format(CultureInfo.CurrentCulture, "Failed to prepare working directory '{0}': {1}", workingDirectory, exception.Message));
             }
 
             if (modelKind == ModelKind.Checkpoint)
@@ -259,7 +259,7 @@ namespace DiGi.YOLO
 
                 if (!File.Exists(weightsPath))
                 {
-                    standardError.Add(string.Format("Reported weights do not exist: {0}", weightsPath));
+                    standardError.Add(string.Format(CultureInfo.CurrentCulture, "Reported weights do not exist: {0}", weightsPath));
                     sHA256 = null;
                 }
                 else if (sHA256 != null)

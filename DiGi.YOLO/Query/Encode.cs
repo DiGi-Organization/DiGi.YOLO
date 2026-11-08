@@ -18,7 +18,7 @@
             string result = path!.Replace(@"\", "/");
 
             //" #" starts a comment and ": " a mapping in a plain YAML scalar; a leading quote or space would change how the scalar is read
-            if (result.Contains(" #") || result.Contains(": ") || result.StartsWith(" ") || result.EndsWith(" ") || result.StartsWith("'") || result.StartsWith("\""))
+            if (result.Contains(" #") || result.Contains(": ") || result.StartsWith(" ", StringComparison.CurrentCulture) || result.EndsWith(" ", StringComparison.CurrentCulture) || result.StartsWith("'", StringComparison.CurrentCulture) || result.StartsWith("\"", StringComparison.CurrentCulture))
             {
                 result = string.Concat("'", result.Replace("'", "''"), "'");
             }

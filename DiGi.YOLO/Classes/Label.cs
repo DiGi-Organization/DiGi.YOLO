@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace DiGi.YOLO.Classes
 {
     /// <summary>
@@ -69,7 +71,7 @@ namespace DiGi.YOLO.Classes
         /// <returns>A string containing the index and name of the label.</returns>
         public override string ToString()
         {
-            return string.Format("{0}: {1}", index, name ?? string.Empty);
+            return string.Format(CultureInfo.CurrentCulture, "{0}: {1}", index, name ?? string.Empty);
         }
     }
 }

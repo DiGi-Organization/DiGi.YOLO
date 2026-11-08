@@ -31,12 +31,12 @@ namespace DiGi.YOLO
             static string Value(string value)
             {
                 string result = value.Trim();
-                if (result.StartsWith("'") || result.StartsWith("\""))
+                if (result.StartsWith("'", StringComparison.CurrentCulture) || result.StartsWith("\"", StringComparison.CurrentCulture))
                 {
                     return result;
                 }
 
-                int index = result.IndexOf(" #");
+                int index = result.IndexOf(" #", StringComparison.CurrentCulture);
                 return index < 0 ? result : result.Substring(0, index).TrimEnd();
             }
 
@@ -52,7 +52,7 @@ namespace DiGi.YOLO
             {
                 string value = line.Trim();
 
-                if (value.Length == 0 || value.StartsWith("#"))
+                if (value.Length == 0 || value.StartsWith("#", StringComparison.CurrentCulture))
                 {
                     continue;
                 }
@@ -72,7 +72,7 @@ namespace DiGi.YOLO
                     if (int.TryParse(key, NumberStyles.Integer, CultureInfo.InvariantCulture, out int labelIndex))
                     {
                         string name = value_Key;
-                        if (name.Length >= 2 && ((name.StartsWith("'") && name.EndsWith("'")) || (name.StartsWith("\"") && name.EndsWith("\""))))
+                        if (name.Length >= 2 && ((name.StartsWith("'", StringComparison.CurrentCulture) && name.EndsWith("'", StringComparison.CurrentCulture)) || (name.StartsWith("\"", StringComparison.CurrentCulture) && name.EndsWith("\"", StringComparison.CurrentCulture))))
                         {
                             name = name.Substring(1, name.Length - 2);
                         }
@@ -114,7 +114,7 @@ namespace DiGi.YOLO
                 string? directory_Resolved = string.IsNullOrWhiteSpace(directory) ? directory_File : Python.Query.NormalizedPath(Path.Combine(directory_File, directory));
                 if (string.IsNullOrWhiteSpace(directory_Resolved) || !Directory.Exists(directory_Resolved))
                 {
-                    messages = [string.Format("Dataset directory '{0}' does not exist; the directory of the configuration file '{1}' is used instead.", directory_Resolved ?? directory, directory_File)];
+                    messages = [string.Format(CultureInfo.CurrentCulture, "Dataset directory '{0}' does not exist; the directory of the configuration file '{1}' is used instead.", directory_Resolved ?? directory, directory_File)];
                     directory_Resolved = directory_File;
                 }
 

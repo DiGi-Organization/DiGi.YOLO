@@ -16,11 +16,11 @@
 
             string result = path!.Trim();
 
-            if (result.Length >= 2 && result.StartsWith("'") && result.EndsWith("'"))
+            if (result.Length >= 2 && result.StartsWith("'", StringComparison.CurrentCulture) && result.EndsWith("'", StringComparison.CurrentCulture))
             {
                 result = result.Substring(1, result.Length - 2).Replace("''", "'");
             }
-            else if (result.Length >= 2 && result.StartsWith("\"") && result.EndsWith("\""))
+            else if (result.Length >= 2 && result.StartsWith("\"", StringComparison.CurrentCulture) && result.EndsWith("\"", StringComparison.CurrentCulture))
             {
                 result = result.Substring(1, result.Length - 2);
             }

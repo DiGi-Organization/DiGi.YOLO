@@ -58,17 +58,17 @@ namespace DiGi.YOLO
             string? split_Name = split == Category.Train ? null : Query.DirectoryName(split);
             if (string.IsNullOrWhiteSpace(split_Name))
             {
-                return Refused(null, [string.Format("Split {0} cannot be validated on; use Validate or Test.", split)]);
+                return Refused(null, [string.Format(CultureInfo.CurrentCulture, "Split {0} cannot be validated on; use Validate or Test.", split)]);
             }
 
             if (Query.ModelKind(modelPath) != ModelKind.Checkpoint || !File.Exists(modelPath))
             {
-                return Refused(null, [string.Format("Weights are not an existing .pt checkpoint: {0}", modelPath)]);
+                return Refused(null, [string.Format(CultureInfo.CurrentCulture, "Weights are not an existing .pt checkpoint: {0}", modelPath)]);
             }
 
             if (!File.Exists(configurationFilePath))
             {
-                return Refused(null, [string.Format("Configuration file does not exist: {0}", configurationFilePath)]);
+                return Refused(null, [string.Format(CultureInfo.CurrentCulture, "Configuration file does not exist: {0}", configurationFilePath)]);
             }
 
             if (yOLOValidationOptions.ImageSize < 32 || yOLOValidationOptions.Batch < 1 || (yOLOValidationOptions.Confidence is double confidence && (double.IsNaN(confidence) || confidence < 0 || confidence > 1)))
@@ -90,7 +90,7 @@ namespace DiGi.YOLO
             }
             catch (Exception exception)
             {
-                return Refused(modelSHA256, [string.Format("Failed to prepare working directory '{0}': {1}", workingDirectory, exception.Message)]);
+                return Refused(modelSHA256, [string.Format(CultureInfo.CurrentCulture, "Failed to prepare working directory '{0}': {1}", workingDirectory, exception.Message)]);
             }
 
             YOLOEnvironmentResult yOLOEnvironmentResult = Query.YOLOEnvironmentResult(pythonPath, modelPath, workingDirectory, cancellationToken);

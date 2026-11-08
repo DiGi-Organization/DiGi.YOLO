@@ -1,4 +1,5 @@
 ﻿using DiGi.YOLO.Enums;
+using System.Globalization;
 using System;
 using System.Collections.Generic;
 
@@ -145,7 +146,7 @@ namespace DiGi.YOLO.Classes
         /// <returns>A formatted string containing the base path, category paths, and label names.</returns>
         public override string? ToString()
         {
-            List<string> values = [string.Format("path: {0}", Query.Encode(directory))];
+            List<string> values = [string.Format(CultureInfo.CurrentCulture, "path: {0}", Query.Encode(directory))];
             foreach (Category category in Enum.GetValues(typeof(Category)))
             {
                 if (!directoryNames.TryGetValue(category, out string? directoryName))
@@ -153,7 +154,7 @@ namespace DiGi.YOLO.Classes
                     directoryName = string.Empty;
                 }
 
-                values.Add(string.Format("{0}: {1}", category.DirectoryName(), Query.Encode(directoryName)));
+                values.Add(string.Format(CultureInfo.CurrentCulture, "{0}: {1}", category.DirectoryName(), Query.Encode(directoryName)));
             }
 
             values.Add("names:");
@@ -163,7 +164,7 @@ namespace DiGi.YOLO.Classes
                 {
                     continue;
                 }
-                values.Add(string.Format("   {0}", label.ToString()));
+                values.Add(string.Format(CultureInfo.CurrentCulture, "   {0}", label.ToString()));
             }
 
             return string.Join(Environment.NewLine, values);

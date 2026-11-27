@@ -50,6 +50,10 @@ Every task offered with a dialog is a subclass `UI<BaseTask>` in `DiGi.GIS.Postg
    `BackgroundTask` has no Canceled state.
 6. Copy the window's options back, then `return await base.ExecuteAsync(progress, cancellationToken);`.
 
+The prompt window's **Import settings.../Export settings...** buttons, the four-method split behind them (`SetControls`,
+`TryReadOptions`, `TryGetOptions`, `TryReadSettings`) and their facts are `Coding - Task Prompts and Settings.md` - the
+copy rule above is what they sit on.
+
 ## 3. Registration
 `DiGi.GIS.PostgreSQL.UI/Create/VisualBackgroundTasks.cs`: `result.Add(Visual(new UI<X>Task(...), "Name", "Description"))`
 inside the `Mode.Server` or `Mode.Client` block (both also run under `Mode.ServerAndClient`). An unregistered task never

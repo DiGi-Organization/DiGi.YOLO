@@ -378,6 +378,7 @@ root) and are mirrored per repository as skills under `.agents/skills/<skill-nam
 | `Coding - ComputeSharp.md` | Writing or changing a ComputeSharp `IComputeShader`. |
 | `Coding - Grasshopper.md` | Grasshopper/Rhino plug-in components. |
 | `Coding - Background Tasks.md` | Tray-application background tasks and their dialogs. |
+| `Coding - Task Prompts and Settings.md` | Tray task prompt windows and their Import/Export settings buttons. |
 | `Coding - WPF Deferred Loading.md` | A WPF window needing slow data; WPF layout checks. |
 | `Coding - YOLO.md` | The YOLO Year Built detector. |
 | `Coding - Laya.md` | The Laya decision model. |

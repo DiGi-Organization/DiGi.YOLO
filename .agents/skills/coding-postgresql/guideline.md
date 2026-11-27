@@ -196,7 +196,8 @@ development database (bodyplan#48).
 | Conf | Tables |
 |---|---|
 | `GIS_PostgreSQL_Main.conf` | `administrative_areal_2d`, `address_point`, `building_2d`, `year_built_data`, occupancy, EPW, unit, statistical data |
-| `GIS_PostgreSQL_Storage.conf` | `orto_datas`, `building_data`, `building_model`, `building`, `terrain_point` |
+| `GIS_PostgreSQL_Storage.conf` | `orto_datas`, `building_data`, `building_model`, `building`, `terrain_point`, the open building tables (`building_dataset` and the six `<dataset>_building_2d` / `ghs_obat_building`, DiGi.GIS.PostgreSQL#168) |
+- **Large data goes to Storage:** the deployed Main database sits on `D:\GIS`, Storage on `E:\GIS` (the large volume); a table has no tablespace of its own, so the converter group that registers it in `Create.GISPostgreSQLConverterManager` decides the volume. Register a bulk-data converter in the Storage block (`OpenBuildingPostgreSQLConverter` was on Main until DiGi.GIS.PostgreSQL#168).
 - **No join across the two:** read each side once as a cheap projection and match in memory, in a `Query` taking both
   converters (`Query.SubdivisionLinksAsync`, `Query.CoveragesAsync`).
 - Check which conf holds every table a statement names: a draw joining three tables on Storage found no

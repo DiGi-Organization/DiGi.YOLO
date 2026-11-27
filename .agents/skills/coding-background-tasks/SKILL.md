@@ -42,7 +42,12 @@ Every task offered with a dialog is a subclass `UI<BaseTask>` in `DiGi.GIS.Postg
 4. `application.Dispatcher.Invoke(() => { … new <X>OptionsWindow(<X>Options, …); ShowDialog() … })` — a window cannot be
    created on the thread-pool thread the task runs on.
 5. The window works on a **copy** (`new XOptions(x)`) exposed as a property named after its type; a cancelled dialog
-   leaves the task's options untouched and ends the run (`Log(...)` + `return false`).
+   leaves the task's options untouched and ends the run **as canceled**: `Log(...)`, `CancelRun();`, `return false;`.
+   The same applies to a cancelled file or folder dialog or a MessageBox Cancel. A bare `return false` is a refusal:
+   `BackgroundTask` wraps it in `BackgroundTaskFailureException`, the tray's `Visual(...)` logs `[ERR] <task> failed`,
+   and the row reads Failed. `return true` reads Completed, although nothing ran
+   (DiGi-Organization/DiGi.GIS.PostgreSQL.UI#61). `CancelRun` is on `CancelableBackgroundTask`; a dialog task on a plain
+   `BackgroundTask` has no Canceled state.
 6. Copy the window's options back, then `return await base.ExecuteAsync(progress, cancellationToken);`.
 
 ## 3. Registration
